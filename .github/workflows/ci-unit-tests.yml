@@ -43,6 +43,11 @@ jobs:
     # This guarantees no leftover state from previous runs
     runs-on: ubuntu-latest
 
+    # Permissions needed for this job
+    # code-quality: write — required to upload code coverage results to GitHub
+    permissions:
+      code-quality: write
+
     # A job is a sequence of steps. Each step runs sequentially (one after another).
     steps:
       # Step 1: Fetch the code from the repository
@@ -77,19 +82,21 @@ jobs:
       #
       # Coverage reporting:
       #   - --cov=src: measure only the src/ directory (where the actual code lives)
-      #   - --cov-report=sarif: generate SARIF format for GitHub's native code coverage UI
+      #   - --cov-report=xml: generate Cobertura XML for GitHub's code coverage upload
       #   - --cov-report=html: generate HTML report as a workflow artifact for detailed inspection
       - name: Run unit tests with coverage
-        run: pytest -m "not integration" --cov=src --cov-report=sarif --cov-report=html
+        run: pytest -m "not integration" --cov=src --cov-report=xml --cov-report=html
 
       # Step 5: Upload coverage to GitHub
-      # This integrates the SARIF report into GitHub's code coverage feature.
-      # Coverage appears inline in PR diffs and in the "Code coverage" check.
+      # Uses the GitHub code coverage action to upload the Cobertura XML report.
+      # On PRs, the github-code-quality bot posts a comment with aggregate coverage %
+      # and per-file breakdowns, making it easy to spot coverage gaps.
       - name: Upload coverage to GitHub
-        uses: github/codeql-action/upload-sarif@v3
+        uses: actions/upload-code-coverage@v1
         if: always()
         with:
-          sarif_file: coverage.sarif
+          file: coverage.xml
+          language: python
 
       # Step 6: Upload HTML coverage report as artifact
       # The HTML report is accessible from the Actions tab for detailed inspection.
