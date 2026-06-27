@@ -1,4 +1,4 @@
-# Commenting Code Guide — Python 3.11
+# Commenting Code Guide
 
 ---
 

@@ -74,5 +74,30 @@ jobs:
       #   - Exclude them from the run
       # Integration tests require HiGHS (the MIP solver), which makes them slow and fragile
       # in CI. A separate workflow handles them.
-      - name: Run unit tests
-        run: pytest -m "not integration"
+      #
+      # Coverage reporting:
+      #   - --cov=src: measure only the src/ directory (where the actual code lives)
+      #   - --cov-report=sarif: generate SARIF format for GitHub's native code coverage UI
+      #   - --cov-report=html: generate HTML report as a workflow artifact for detailed inspection
+      - name: Run unit tests with coverage
+        run: pytest -m "not integration" --cov=src --cov-report=sarif --cov-report=html
+
+      # Step 5: Upload coverage to GitHub
+      # This integrates the SARIF report into GitHub's code coverage feature.
+      # Coverage appears inline in PR diffs and in the "Code coverage" check.
+      - name: Upload coverage to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: coverage.sarif
+
+      # Step 6: Upload HTML coverage report as artifact
+      # The HTML report is accessible from the Actions tab for detailed inspection.
+      # Useful for: understanding which lines aren't covered, finding test gaps.
+      - name: Upload HTML coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: htmlcov/
+          retention-days: 30
