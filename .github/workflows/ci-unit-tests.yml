@@ -91,9 +91,11 @@ jobs:
       # Uses the GitHub code coverage action to upload the Cobertura XML report.
       # On PRs, the github-code-quality bot posts a comment with aggregate coverage %
       # and per-file breakdowns, making it easy to spot coverage gaps.
+      # Only upload on PRs or pushes to main, since GitHub's API rejects uploads from
+      # other branches without a PR context (HTTP 400).
       - name: Upload coverage to GitHub
         uses: actions/upload-code-coverage@v1
-        if: always()
+        if: always() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
         with:
           file: coverage.xml
           language: python
