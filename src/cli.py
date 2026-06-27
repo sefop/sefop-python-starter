@@ -21,7 +21,7 @@ from dependencies import create_optimization_service
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Solve a knapsack optimisation request from a JSON data file."
+        description="Solve a knapsack optimization request from a JSON data file."
     )
     parser.add_argument(
         "request_id",
