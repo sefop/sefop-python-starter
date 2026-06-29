@@ -20,6 +20,7 @@ from engine.optimization_strategy.mip.optimization.solvers.base_technology_solve
 from engine.optimization_strategy.mip.optimization.solvers.highs_solver import HighsSolver
 from engine.pre_processed_data import PreProcessedData
 from domain.recommendation import Recommendation
+from domain.request import Request
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +57,15 @@ class Optimization:
         """
         request = preprocessed_data.request
 
-        # Subphase 1: build solver-agnostic model
-        model = self._build_model(request)
+        # Subphase 1: build solver-agnostic model over feasible products only.
+        # Wrapping feasible_products in a temporary Request lets the model
+        # components work unchanged — they only see products that can be selected.
+        feasible_request = Request(
+            max_weight_kg=request.max_weight_kg,
+            max_budget_usd=request.max_budget_usd,
+            products=preprocessed_data.feasible_products,
+        )
+        model = self._build_model(feasible_request)
 
         # Subphase 2: solve
         solution = self._solver.solve(model)

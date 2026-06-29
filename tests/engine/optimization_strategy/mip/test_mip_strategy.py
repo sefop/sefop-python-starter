@@ -22,7 +22,7 @@ def test__mip_strategy__when_request_is_solvable__returns_recommendation(banana,
     strategy = MipStrategy()
 
     # ACT
-    data = PreProcessedData(request=request)
+    data = PreProcessedData(request=request, feasible_products=list(request.products))
     result = strategy.solve(data)
 
     # ASSERT
@@ -40,7 +40,7 @@ def test__mip_strategy__when_no_product_fits__returns_none():
     strategy = MipStrategy()
 
     # ACT
-    data = PreProcessedData(request=request)
+    data = PreProcessedData(request=request, feasible_products=list(request.products))
     result = strategy.solve(data)
 
     # ASSERT

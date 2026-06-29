@@ -1,10 +1,13 @@
 """Preprocessing stage that prepares request data for optimization strategies.
 
-All products are already validated by the domain layer (Request.__post_init__
-ensures positive weight, price, and calories and no duplicates), so
-preprocessing is a pass-through. This stage exists as an extension point:
-override PreProcess.run() to add enrichment or custom filtering without
-touching the optimizer.
+Domain validation (Request.__post_init__) already guarantees that each product
+has positive weight, price, and calories and that names are unique. Preprocessing
+goes one step further: it removes products that can never appear in any solution.
+
+A product is *individually infeasible* if a single unit of it already exceeds
+either the weight capacity or the budget. No strategy — exact or heuristic —
+could ever select such a product, so filtering them out here shrinks the problem
+before any solver sees it.
 """
 
 from __future__ import annotations
@@ -16,17 +19,27 @@ from domain.request import Request
 class PreProcess:
     """Preprocessing step before strategy execution.
 
-    Default implementation: wrap the request in PreProcessedData unchanged.
-    Override to add data enrichment, filtering, or parameter tuning.
+    Filters out products that are individually infeasible, then wraps the
+    remaining data in PreProcessedData for the strategy stage.
     """
 
     def run(self, request: Request) -> PreProcessedData:
-        """Wrap the request for the optimization stage.
+        """Filter infeasible products and prepare data for the strategy stage.
+
+        A product is infeasible when a single unit costs more than the total
+        budget or weighs more than the total weight capacity — it can never
+        be included in any valid solution.
 
         Args:
             request: The validated knapsack request.
 
         Returns:
-            PreProcessedData containing the request.
+            PreProcessedData with feasible_products containing only the
+            products that can physically fit within the constraints.
         """
-        return PreProcessedData(request=request)
+        feasible_products = [
+            p for p in request.products
+            if p.price_usd <= request.max_budget_usd
+            and p.weight_kg <= request.max_weight_kg
+        ]
+        return PreProcessedData(request=request, feasible_products=feasible_products)

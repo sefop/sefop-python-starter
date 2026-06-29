@@ -33,7 +33,7 @@ class GreedyCalories(OptimizationStrategy):
         """
         request = data.request
         sorted_products = sorted(
-            request.products,
+            data.feasible_products,
             key=lambda p: p.calories / p.weight_kg,
             reverse=True,
         )

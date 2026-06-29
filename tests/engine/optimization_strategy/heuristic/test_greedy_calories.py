@@ -22,7 +22,7 @@ def test__greedy_calories__when_no_product_fits__returns_none():
     strategy = GreedyCalories()
 
     # ACT
-    data = PreProcessedData(request=request)
+    data = PreProcessedData(request=request, feasible_products=list(request.products))
     result = strategy.solve(data)
 
     # ASSERT
@@ -35,7 +35,7 @@ def test__greedy_calories__picks_maximum_feasible_quantity(banana):
     strategy = GreedyCalories()
 
     # ACT
-    data = PreProcessedData(request=request)
+    data = PreProcessedData(request=request, feasible_products=list(request.products))
     result = strategy.solve(data)
 
     # ASSERT
@@ -53,7 +53,7 @@ def test__greedy_calories__falls_through_to_next_product_when_primary_is_exhaust
     strategy = GreedyCalories()
 
     # ACT
-    data = PreProcessedData(request=request)
+    data = PreProcessedData(request=request, feasible_products=list(request.products))
     result = strategy.solve(data)
 
     # ASSERT
@@ -71,7 +71,7 @@ def test__greedy_calories__picks_highest_calorie_density_first(banana, chips):
     strategy = GreedyCalories()
 
     # ACT
-    data = PreProcessedData(request=request)
+    data = PreProcessedData(request=request, feasible_products=list(request.products))
     result = strategy.solve(data)
 
     # ASSERT

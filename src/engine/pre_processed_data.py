@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from domain.product import Product
 from domain.request import Request
 
 
@@ -17,6 +18,11 @@ class PreProcessedData:
 
     Attributes:
         request: The original knapsack request.
+        feasible_products: Products where a single unit fits within both the
+            weight and budget constraints. Strategies should iterate this list
+            instead of request.products to avoid wasting effort on products
+            that can never be selected.
     """
 
     request: Request
+    feasible_products: list[Product]

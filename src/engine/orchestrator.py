@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 
 from engine.optimization_strategy.optimization_strategy import OptimizationStrategy
+from engine.pre_processed_data import PreProcessedData
 from engine.preprocessing import PreProcess
 from engine.postprocessing import PostProcess
 from engine.optimization_strategy.heuristic.greedy_calories import GreedyCalories
@@ -28,16 +29,20 @@ logger = logging.getLogger(__name__)
 MAX_PRODUCTS_FOR_MIP = 50
 
 
-def _select_strategy(request: Request) -> OptimizationStrategy:
-    """Choose MIP or greedy based on problem size.
+def _select_strategy(data: PreProcessedData) -> OptimizationStrategy:
+    """Choose MIP or greedy based on the number of feasible products.
+
+    Using feasible_products (not request.products) reflects the actual problem
+    size after preprocessing: infeasible products were already removed and will
+    not appear in the model.
 
     Args:
-        request: The request to evaluate.
+        data: The preprocessed data to evaluate.
 
     Returns:
         The strategy instance to use.
     """
-    if len(request.products) <= MAX_PRODUCTS_FOR_MIP:
+    if len(data.feasible_products) <= MAX_PRODUCTS_FOR_MIP:
         return MipStrategy()
     return GreedyCalories()
 
@@ -65,7 +70,12 @@ class Orchestrator:
             The best Recommendation found, or None if no feasible solution exists.
         """
         data = self._preprocessing.run(request)
-        optimization_strategy : OptimizationStrategy = _select_strategy(request)
+        if not data.feasible_products:
+            # Every product costs more than the budget or weighs more than the
+            # capacity, so no valid selection exists.
+            logger.warning("No feasible products after preprocessing; skipping solve")
+            return None
+        optimization_strategy: OptimizationStrategy = _select_strategy(data)
         result = optimization_strategy.solve(data)
         if result is None:
             return None
