@@ -41,14 +41,16 @@ The solver picks 4 apples — chocolate costs 10× more per calorie, so it never
 
 ```
 src/
-  domain/               # pure entities — no imports from other folders
-  services/             # orchestration + data loading
-  optimization/         # solving logic
-  dependencies.py       # composition root
+  domain/               # pure entities — Product, Request, Recommendation
+  services/             # data loading and application service
+  engine/
+    orchestrator.py     # pipeline coordinator: pre → strategy → post
+    preprocessing/      # filter infeasible products before solving
+    optimization/       # MIP solver and greedy heuristic
+    postprocessing/     # sort and refine the recommendation
   cli.py                # CLI entry point
-tests/                  # automatic tests
-data/                   # sample instances
-docs/                   # guides and documentation
+tests/                  # mirrors src/ structure
+data/                   # sample problem instances
 ```
 
 ---
@@ -100,7 +102,7 @@ pytest -m integration
 ```bash
 pytest tests/domain/          # domain unit tests only
 pytest tests/services/        # service tests only
-pytest tests/optimization/    # optimization + MIP tests
+pytest tests/engine/          # engine, strategies, pre/postprocessing tests
 ```
 
 ---
@@ -120,14 +122,16 @@ python -m cli 2  # solve request from data/2/data.json
 This project demonstrates **Clean Architecture** applied to optimization:
 
 1. **`domain/`** — Pure business logic (Product, Request, Recommendation) with no external dependencies
-2. **`services/`** — Orchestration and data loading (Engine selects a solver strategy)
-3. **`optimization/`** — Solver implementations:
+2. **`services/`** — Data loading (`JsonDataLoader`) and the application service that wires loading to the engine
+3. **`engine/orchestrator.py`** — Pipeline coordinator: runs preprocessing → picks a strategy → runs postprocessing
+4. **`engine/preprocessing/`** — Filters out products that can never be selected (individually infeasible)
+5. **`engine/optimization/`** — Solver implementations:
    - **Greedy heuristic** — fast, approximate solution for large problems
    - **MIP solver** — exact optimal solution via HiGHS for small problems
-4. **`cli.py`** — Entry point that loads data and calls the solver
-5. **`dependencies.py`** — Composition root that wires all layers together
+6. **`engine/postprocessing/`** — Refines the recommendation (e.g., sorts products by quantity)
+7. **`cli.py`** — Entry point that loads data and calls the solver
 
-The Engine automatically chooses the right solver based on problem size (≤50 products → MIP; larger → greedy).
+The orchestrator automatically chooses the right solver based on problem size (≤50 products → MIP; larger → greedy).
 
 ---
 
@@ -135,7 +139,7 @@ The Engine automatically chooses the right solver based on problem size (≤50 p
 
 After `pip install -e .`, your code is live:
 - Edit any file in `src/` → changes are instant (no reinstall)
-- Run tests anytime: `python pytest`
+- Run tests anytime: `pytest`
 - Run CLI anytime: `python -m cli 1`
 
 ---
