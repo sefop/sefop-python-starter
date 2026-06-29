@@ -36,9 +36,9 @@ class HighsSolver(BaseTechnologySolver):
     """HiGHS solver implementation using the highspy Python bindings.
 
     Translates the solver-agnostic ``OptimizationModel`` into HiGHS calls:
-    variables â†’ ``addVar`` / ``changeColIntegrality``,
-    constraints â†’ ``addRow``,
-    objective â†’ ``changeColCost`` / ``changeObjectiveSense``.
+    variables -> ``addVar`` / ``changeColIntegrality``,
+    constraints -> ``addRow``,
+    objective -> ``changeColCost`` / ``changeObjectiveSense``.
     """
 
     def __init__(self) -> None:
