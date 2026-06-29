@@ -9,6 +9,34 @@
 
 ---
 
+## What problem does this solve?
+
+Given a **budget** and a **weight limit**, pick the combination of products that **maximizes total calories**.
+
+This is known as the Knapsack problem — a classic in operations research.
+
+### Example — [`data/2/data.json`](data/2/data.json)
+
+| Product   | Price  | Weight  | Calories |
+|-----------|--------|---------|----------|
+| Apple     | $1.00  | 0.50 kg | 100      |
+| Chocolate | $5.00  | 1.00 kg | 50       |
+
+**Constraints:** budget $10.00 · weight limit 2.00 kg
+
+**Optimal solution:**
+```
+Products selected:
+  apple        x4  (400 cal, $4.00, 2.00 kg)
+Total calories : 400
+Total cost     : $4.00
+Total weight   : 2.00 kg
+```
+
+The solver picks 4 apples — chocolate costs 10× more per calorie, so it never appears in the optimal solution.
+
+---
+
 ## Repository structure
 
 ```
