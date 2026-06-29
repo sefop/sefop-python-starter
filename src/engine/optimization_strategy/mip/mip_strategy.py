@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class MipStrategy(OptimizationStrategy):
     """Mixed-Integer Programming Strategy.
 
-    Solves the knapsack problem exactly via linear programming. Accepts
+    Solves the knapsack problem exactly. Accepts
     preprocessed data and returns a recommendation.
     """
 

@@ -86,7 +86,7 @@ class Optimization:
         product_map = {p.name: p for p in request.products}
         quantities = {}
         for name, value in variable_values.items():
-            # Round to nearest integer â€” MIP solvers use floating-point arithmetic
+            # Round to nearest integer” MIP solvers use floating-point arithmetic
             qty = int(round(value))
             if qty >= 1:
                 quantities[product_map[name]] = qty

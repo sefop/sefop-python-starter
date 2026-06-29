@@ -28,6 +28,20 @@ logger = logging.getLogger(__name__)
 MAX_PRODUCTS_FOR_MIP = 50
 
 
+def _select_strategy(request: Request) -> OptimizationStrategy:
+    """Choose MIP or greedy based on problem size.
+
+    Args:
+        request: The request to evaluate.
+
+    Returns:
+        The strategy instance to use.
+    """
+    if len(request.products) <= MAX_PRODUCTS_FOR_MIP:
+        return MipStrategy()
+    return GreedyCalories()
+
+
 class Orchestrator:
     """Selects and runs the appropriate optimization strategy for a Request.
 
@@ -37,18 +51,9 @@ class Orchestrator:
     strategy selection, postprocessing) are coordinated here.
     """
 
-    def __init__(self, max_products_for_mip: int = MAX_PRODUCTS_FOR_MIP) -> None:
-        """Initialize with both strategy implementations available.
-
-        Args:
-            max_products_for_mip: Threshold above which the greedy heuristic
-                is used instead of the (slower) MIP solver. Exposed for testing.
-        """
+    def __init__(self) -> None:
         self._preprocessing = PreProcess()
         self._postprocessing = PostProcess()
-        self._heuristic = GreedyCalories()
-        self._mip = MipStrategy()
-        self._max_products_for_mip = max_products_for_mip
 
     def solve(self, request: Request) -> Recommendation | None:
         """Run the full optimization pipeline.
@@ -60,26 +65,8 @@ class Orchestrator:
             The best Recommendation found, or None if no feasible solution exists.
         """
         data = self._preprocessing.run(request)
-        strategy = self._select_strategy(request)
-        logger.info(
-            "Selected %s for %d products",
-            type(strategy).__name__,
-            len(request.products),
-        )
-        result = strategy.solve(data)
+        optimization_strategy : OptimizationStrategy = _select_strategy(request)
+        result = optimization_strategy.solve(data)
         if result is None:
             return None
         return self._postprocessing.run(result)
-
-    def _select_strategy(self, request: Request) -> OptimizationStrategy:
-        """Choose MIP or greedy based on problem size.
-
-        Args:
-            request: The request to evaluate.
-
-        Returns:
-            The strategy instance to use.
-        """
-        if len(request.products) <= self._max_products_for_mip:
-            return self._mip
-        return self._heuristic
