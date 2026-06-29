@@ -13,12 +13,12 @@ from __future__ import annotations
 
 import logging
 
-from engine.optimization_strategy.optimization_strategy import OptimizationStrategy
-from engine.pre_processed_data import PreProcessedData
-from engine.preprocessing import PreProcess
-from engine.postprocessing import PostProcess
-from engine.optimization_strategy.heuristic.greedy_calories import GreedyCalories
-from engine.optimization_strategy.mip.mip_strategy import MipStrategy
+from engine.optimization.optimization_strategy import OptimizationStrategy
+from engine.preprocessing.pre_processed_data import PreProcessedData
+from engine.preprocessing.preprocessing import PreProcess
+from engine.postprocessing.postprocessing import PostProcess
+from engine.optimization.heuristic.greedy_calories import GreedyCalories
+from engine.optimization.mip.mip_strategy import MipStrategy
 from domain.recommendation import Recommendation
 from domain.request import Request
 

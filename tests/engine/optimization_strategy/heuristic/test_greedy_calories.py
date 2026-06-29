@@ -1,8 +1,8 @@
 ﻿import pytest
 from domain.product import Product
 from domain.request import Request
-from engine.pre_processed_data import PreProcessedData
-from engine.optimization_strategy.heuristic.greedy_calories import GreedyCalories
+from engine.preprocessing.pre_processed_data import PreProcessedData
+from engine.optimization.heuristic.greedy_calories import GreedyCalories
 
 
 @pytest.fixture

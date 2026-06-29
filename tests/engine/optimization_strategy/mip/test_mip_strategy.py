@@ -1,8 +1,8 @@
 ﻿import pytest
 from domain.product import Product
 from domain.request import Request
-from engine.pre_processed_data import PreProcessedData
-from engine.optimization_strategy.mip.mip_strategy import MipStrategy
+from engine.preprocessing.pre_processed_data import PreProcessedData
+from engine.optimization.mip.mip_strategy import MipStrategy
 
 
 @pytest.fixture

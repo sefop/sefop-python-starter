@@ -13,9 +13,9 @@ from __future__ import annotations
 
 import logging
 
-from engine.optimization_strategy.optimization_strategy import OptimizationStrategy
-from engine.pre_processed_data import PreProcessedData
-from engine.optimization_strategy.mip.optimization.optimization import Optimization
+from engine.optimization.optimization_strategy import OptimizationStrategy
+from engine.preprocessing.pre_processed_data import PreProcessedData
+from engine.optimization.mip.optimization.optimization import Optimization
 from domain.recommendation import Recommendation
 
 logger = logging.getLogger(__name__)

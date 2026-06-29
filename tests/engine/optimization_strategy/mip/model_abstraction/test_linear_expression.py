@@ -1,4 +1,4 @@
-﻿from engine.optimization_strategy.mip.optimization.model_abstraction.linear_expression import LinearExpression
+﻿from engine.optimization.mip.optimization.model_abstraction.linear_expression import LinearExpression
 
 
 def test__linear_expression__add__creates_term():

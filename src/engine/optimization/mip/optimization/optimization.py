@@ -11,14 +11,14 @@ from __future__ import annotations
 
 import logging
 
-from engine.optimization_strategy.mip.optimization.components.constraint_limit_budget import ConstraintLimitBudget
-from engine.optimization_strategy.mip.optimization.components.constraint_limit_weight import ConstraintLimitWeight
-from engine.optimization_strategy.mip.optimization.components.objective_calories import ObjectiveCalories
-from engine.optimization_strategy.mip.optimization.components.variable_select_product import VariableSelectProduct
-from engine.optimization_strategy.mip.optimization.model_abstraction.optimization_model import ObjectiveSense, OptimizationModel
-from engine.optimization_strategy.mip.optimization.solvers.base_technology_solver import BaseTechnologySolver
-from engine.optimization_strategy.mip.optimization.solvers.highs_solver import HighsSolver
-from engine.pre_processed_data import PreProcessedData
+from engine.optimization.mip.optimization.components.constraint_limit_budget import ConstraintLimitBudget
+from engine.optimization.mip.optimization.components.constraint_limit_weight import ConstraintLimitWeight
+from engine.optimization.mip.optimization.components.objective_calories import ObjectiveCalories
+from engine.optimization.mip.optimization.components.variable_select_product import VariableSelectProduct
+from engine.optimization.mip.optimization.model_abstraction.optimization_model import ObjectiveSense, OptimizationModel
+from engine.optimization.mip.optimization.solvers.base_technology_solver import BaseTechnologySolver
+from engine.optimization.mip.optimization.solvers.highs_solver import HighsSolver
+from engine.preprocessing.pre_processed_data import PreProcessedData
 from domain.recommendation import Recommendation
 from domain.request import Request
 

@@ -10,9 +10,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 
-from engine.optimization_strategy.mip.optimization.model_abstraction.linear_constraint import LinearConstraint
-from engine.optimization_strategy.mip.optimization.model_abstraction.linear_expression import LinearExpression
-from engine.optimization_strategy.mip.optimization.model_abstraction.model_variable import ModelVariable
+from engine.optimization.mip.optimization.model_abstraction.linear_constraint import LinearConstraint
+from engine.optimization.mip.optimization.model_abstraction.linear_expression import LinearExpression
+from engine.optimization.mip.optimization.model_abstraction.model_variable import ModelVariable
 
 
 class ObjectiveSense(StrEnum):

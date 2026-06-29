@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from engine.optimization_strategy.mip.optimization.model_abstraction.model_solution import ModelSolution
-from engine.optimization_strategy.mip.optimization.model_abstraction.optimization_model import OptimizationModel
+from engine.optimization.mip.optimization.model_abstraction.model_solution import ModelSolution
+from engine.optimization.mip.optimization.model_abstraction.optimization_model import OptimizationModel
 
 
 class BaseTechnologySolver(ABC):

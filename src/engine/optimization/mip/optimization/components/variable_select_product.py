@@ -6,7 +6,7 @@ Pure Python stdlib only â€” no solver dependency.
 
 from __future__ import annotations
 
-from engine.optimization_strategy.mip.optimization.model_abstraction.model_variable import ModelVariable, VarType
+from engine.optimization.mip.optimization.model_abstraction.model_variable import ModelVariable, VarType
 from domain.request import Request
 
 

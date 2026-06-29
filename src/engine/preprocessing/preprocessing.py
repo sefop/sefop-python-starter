@@ -12,7 +12,7 @@ before any solver sees it.
 
 from __future__ import annotations
 
-from engine.pre_processed_data import PreProcessedData
+from engine.preprocessing.pre_processed_data import PreProcessedData
 from domain.request import Request
 
 

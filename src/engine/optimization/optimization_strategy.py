@@ -9,7 +9,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from domain.recommendation import Recommendation
-from engine.pre_processed_data import PreProcessedData
+from engine.preprocessing.pre_processed_data import PreProcessedData
 
 
 class OptimizationStrategy(ABC):

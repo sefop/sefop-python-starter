@@ -1,7 +1,7 @@
 ﻿import pytest
 from domain.product import Product
 from domain.request import Request
-from engine.optimization_strategy.mip.optimization.components.constraint_limit_weight import ConstraintLimitWeight
+from engine.optimization.mip.optimization.components.constraint_limit_weight import ConstraintLimitWeight
 
 
 @pytest.fixture

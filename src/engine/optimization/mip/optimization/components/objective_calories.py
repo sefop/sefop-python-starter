@@ -5,7 +5,7 @@ Pure Python stdlib only â€” no solver dependency.
 
 from __future__ import annotations
 
-from engine.optimization_strategy.mip.optimization.model_abstraction.linear_expression import LinearExpression
+from engine.optimization.mip.optimization.model_abstraction.linear_expression import LinearExpression
 from domain.request import Request
 
 # Scaling factor for the calorie term in the objective function.

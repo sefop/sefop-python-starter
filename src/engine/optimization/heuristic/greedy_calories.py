@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from math import floor
 
-from engine.optimization_strategy.optimization_strategy import OptimizationStrategy
-from engine.pre_processed_data import PreProcessedData
+from engine.optimization.optimization_strategy import OptimizationStrategy
+from engine.preprocessing.pre_processed_data import PreProcessedData
 from domain.recommendation import Recommendation
 
 

@@ -1,7 +1,7 @@
 import pytest
 from domain.product import Product
 from domain.request import Request
-from engine.preprocessing import PreProcess
+from engine.preprocessing.preprocessing import PreProcess
 
 
 @pytest.fixture

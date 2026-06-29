@@ -1,7 +1,7 @@
 ﻿import pytest
 from domain.product import Product
 from domain.request import Request
-from engine.optimization_strategy.mip.optimization.components.variable_select_product import VariableSelectProduct
+from engine.optimization.mip.optimization.components.variable_select_product import VariableSelectProduct
 
 
 @pytest.fixture

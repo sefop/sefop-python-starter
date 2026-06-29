@@ -13,11 +13,11 @@ import logging
 import highspy
 import numpy as np
 
-from engine.optimization_strategy.mip.optimization.model_abstraction.linear_constraint import ConstraintSign
-from engine.optimization_strategy.mip.optimization.model_abstraction.model_solution import ModelSolution, SolutionStatus
-from engine.optimization_strategy.mip.optimization.model_abstraction.model_variable import VarType
-from engine.optimization_strategy.mip.optimization.model_abstraction.optimization_model import ObjectiveSense, OptimizationModel
-from engine.optimization_strategy.mip.optimization.solvers.base_technology_solver import BaseTechnologySolver
+from engine.optimization.mip.optimization.model_abstraction.linear_constraint import ConstraintSign
+from engine.optimization.mip.optimization.model_abstraction.model_solution import ModelSolution, SolutionStatus
+from engine.optimization.mip.optimization.model_abstraction.model_variable import VarType
+from engine.optimization.mip.optimization.model_abstraction.optimization_model import ObjectiveSense, OptimizationModel
+from engine.optimization.mip.optimization.solvers.base_technology_solver import BaseTechnologySolver
 
 logger = logging.getLogger(__name__)
 

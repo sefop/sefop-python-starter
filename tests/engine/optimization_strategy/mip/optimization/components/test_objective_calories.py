@@ -1,7 +1,7 @@
 ﻿import pytest
 from domain.product import Product
 from domain.request import Request
-from engine.optimization_strategy.mip.optimization.components.objective_calories import ObjectiveCalories
+from engine.optimization.mip.optimization.components.objective_calories import ObjectiveCalories
 
 
 @pytest.fixture
