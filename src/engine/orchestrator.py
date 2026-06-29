@@ -1,11 +1,11 @@
-"""Orchestrates the knapsack optimization pipeline.
+﻿"""Orchestrates the knapsack optimization pipeline.
 
 The Orchestrator is the public face of the optimization package. Given a Request,
-it orchestrates three explicit stages: preprocessing → strategy selection and
-solving → postprocessing. Returns a Recommendation or None. Callers never need
+it orchestrates three explicit stages: preprocessing â†’ strategy selection and
+solving â†’ postprocessing. Returns a Recommendation or None. Callers never need
 to know which strategy was chosen or how preprocessing/postprocessing work.
 
-Key design: strategy selection is based on problem size. Small problems (≤50
+Key design: strategy selection is based on problem size. Small problems (â‰¤50
 products) use the exact MIP solver; larger problems use the fast greedy
 heuristic. This selection is hidden from callers.
 """
@@ -13,11 +13,11 @@ from __future__ import annotations
 
 import logging
 
-from engine.strategy.base_strategy import BaseOptimizationStrategy
+from engine.optimization_strategy.optimization_strategy import OptimizationStrategy
 from engine.preprocessing import PreProcess
 from engine.postprocessing import PostProcess
-from engine.strategy.heuristic.greedy_calories import GreedyCalories
-from engine.strategy.mip.mip_strategy import MipStrategy
+from engine.optimization_strategy.heuristic.greedy_calories import GreedyCalories
+from engine.optimization_strategy.mip.mip_strategy import MipStrategy
 from domain.recommendation import Recommendation
 from domain.request import Request
 
@@ -71,7 +71,7 @@ class Orchestrator:
             return None
         return self._postprocessing.run(result)
 
-    def _select_strategy(self, request: Request) -> BaseOptimizationStrategy:
+    def _select_strategy(self, request: Request) -> OptimizationStrategy:
         """Choose MIP or greedy based on problem size.
 
         Args:
