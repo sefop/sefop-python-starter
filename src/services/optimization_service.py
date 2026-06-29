@@ -9,7 +9,7 @@ import logging
 
 from services.base_data_loader import BaseDataLoader
 from services.optimization_response import OptimizationResponse
-from optimization.engine import Engine
+from engine.orchestrator import Orchestrator
 
 logger = logging.getLogger(__name__)
 
@@ -18,13 +18,13 @@ class OptimizationService:
     """Orchestrates the "load → optimize → respond" pipeline for one request.
 
     A use case: given a request ID, fetch the data, run the optimization via
-    the Engine, and return a response. The service creates the Engine
+    the Orchestrator, and return a response. The service creates the Orchestrator
     internally and coordinates data loading with solving.
     """
 
     def __init__(self, request_loader: BaseDataLoader) -> None:
         self._request_loader = request_loader
-        self._engine = Engine()
+        self._orchestrator = Orchestrator()
 
     def solve(self, request_id: str) -> OptimizationResponse:
         """Load a request and run the optimization pipeline.
@@ -42,10 +42,10 @@ class OptimizationService:
             logger.warning("Request not found: %s", request_id)
             return OptimizationResponse.failure(f"Request '{request_id}' not found")
 
-        recommendation = self._engine.solve(request)
+        recommendation = self._orchestrator.solve(request)
         if recommendation is None:
             logger.warning("No feasible solution for request: %s", request_id)
             return OptimizationResponse.failure("No feasible solution found")
 
-        logger.info("Request %s solved successfully", request_id)
+        logger.info("--------- Request %s solved successfully ---------", request_id)
         return OptimizationResponse.success(recommendation)

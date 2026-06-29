@@ -16,12 +16,14 @@ from __future__ import annotations
 import argparse
 import sys
 
-from dependencies import create_optimization_service
+from services.optimization_service import OptimizationService
+from services.json_data_loader import JsonDataLoader
+from services.settings import Settings
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Solve a knapsack optimization request from a JSON data file."
+        description="Solve a knapsack optimization request given some data"
     )
     parser.add_argument(
         "request_id",
@@ -29,7 +31,9 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    service = create_optimization_service()
+    settings = Settings()
+    loader = JsonDataLoader(folder_path=settings.folder_path)
+    service = OptimizationService(request_loader=loader)
     response = service.solve(args.request_id)
 
     if response.status == "SUCCESS":

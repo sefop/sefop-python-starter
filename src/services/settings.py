@@ -2,7 +2,7 @@
 
 Configuration comes from the external environment (env vars, defaults).
 The rest of the application never reads environment variables directly — it
-reads from Settings instead, so configuration is centralised and easy to change.
+reads from Settings instead, so configuration is centralized and easy to change.
 """
 from __future__ import annotations
 

@@ -55,7 +55,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 # "Look in the src/ folder and automatically find all Python packages."
 # A package is any folder with an __init__.py file.
-# This discovers: domain/, services/, optimization/, and all nested subfolders.
+# This discovers: domain/, services/, engine/, and all nested subfolders.
 
 # =============================================================================
 # [tool.pytest.ini_options] — Configuration for the pytest test runner

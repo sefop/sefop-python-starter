@@ -110,7 +110,5 @@ After `pip install -e .`, your code is live:
 - Run tests anytime: `python pytest`
 - Run CLI anytime: `python -m cli 1`
 
-This is how professional Python projects work in development mode.
-
 ---
 
