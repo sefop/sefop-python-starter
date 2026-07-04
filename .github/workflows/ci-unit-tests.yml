@@ -73,7 +73,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Step 4: Run unit tests (exclude integration tests)
+      # Step 4: Run mypy (static type check)
+      # Type errors are usually cheap to catch and expensive to debug at runtime, so this
+      # runs before the test suite: if the types are wrong, there's no need to wait for the
+      # (slower) tests too. Configuration lives in pyproject.toml's [tool.mypy] section.
+      - name: Run mypy (static type check)
+        run: mypy
+
+      # Step 5: Run unit tests (exclude integration tests)
       # pytest -m "not integration" means:
       #   - Find all tests with @pytest.mark.integration
       #   - Exclude them from the run
@@ -87,7 +94,7 @@ jobs:
       - name: Run unit tests with coverage
         run: pytest -m "not integration" --cov=src --cov-report=xml --cov-report=html
 
-      # Step 5: Upload coverage to GitHub
+      # Step 6: Upload coverage to GitHub
       # Uses the GitHub code coverage action to upload the Cobertura XML report.
       # On PRs, the github-code-quality bot posts a comment with aggregate coverage %
       # and per-file breakdowns, making it easy to spot coverage gaps.
@@ -100,7 +107,7 @@ jobs:
           file: coverage.xml
           language: python
 
-      # Step 6: Upload HTML coverage report as artifact
+      # Step 7: Upload HTML coverage report as artifact
       # The HTML report is accessible from the Actions tab for detailed inspection.
       # Useful for: understanding which lines aren't covered, finding test gaps.
       - name: Upload HTML coverage report

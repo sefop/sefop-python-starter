@@ -36,7 +36,7 @@ def main() -> None:
     service = OptimizationService(request_loader=loader)
     response = service.solve(args.request_id)
 
-    if response.status == "SUCCESS":
+    if response.recommendation is not None:
         rec = response.recommendation
         print(f"\nStatus  : {response.status}")
         print("Products selected:")

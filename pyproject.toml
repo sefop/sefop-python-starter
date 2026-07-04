@@ -97,6 +97,53 @@ target-version = ["py312"]
 # Black will use Python 3.12 syntax (no syntax from 3.13 that 3.12 doesn't support).
 
 # =============================================================================
+# [tool.mypy] — Configuration for the mypy static type checker
+# =============================================================================
+# Every function in src/ is already annotated with type hints (see the comment-code
+# skill, section 5), but nothing checks that those hints are correct or complete until
+# now. Mypy reads them and verifies they're internally consistent - e.g. that a function
+# annotated to return `Product` never actually returns `None`.
+# Run: `mypy` (uses this config automatically).
+[tool.mypy]
+python_version = "3.12"
+# Check against the same Python version this project targets (see requires-python above).
+
+mypy_path = "src"
+explicit_package_bases = true
+# This project uses a "src layout": [tool.setuptools] above maps package-dir "" to "src",
+# so code imports as `from domain.product import Product`, not
+# `from src.domain.product import Product`. src/__init__.py also exists, so without this
+# setting mypy would walk upward looking for the topmost folder with an __init__.py (which
+# is src/ itself) and prefix every module with "src.", producing import errors that don't
+# match how the code is actually run. mypy_path + explicit_package_bases tells mypy to treat
+# src/ as the root instead - the same role pytest's `pythonpath = ["src", "."]" plays below.
+
+files = ["src"]
+# Only type-check the framework code, not tests/. Tests commonly use loose typing
+# (fixtures, parametrize, mocks) that would add noise without much benefit here.
+
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+# Every function must have a complete set of type hints - no partially-annotated
+# signatures. This turns the project's existing type-hint convention into an enforced rule.
+
+warn_return_any = true
+# Flags a function whose return type annotation is a concrete type (e.g. `-> Product`) but
+# whose actual returned value mypy can only infer as `Any` - usually a sign the annotation,
+# or an upstream call it depends on, is wrong.
+
+warn_unused_ignores = true
+# Flags `# type: ignore` comments that are no longer suppressing any real error, so stale
+# ignores get cleaned up instead of silently accumulating.
+
+[[tool.mypy.overrides]]
+module = "highspy.*"
+ignore_missing_imports = true
+# highspy is a compiled C++ extension (the HiGHS solver's Python bindings) and ships no type
+# stubs, so mypy cannot see its types. Without this override, mypy fails with "Cannot find
+# implementation or library stub for module" every time highspy is imported.
+
+# =============================================================================
 # Why this structure? (for data scientists new to Python packaging)
 # =============================================================================
 # Before pyproject.toml, projects used separate files:

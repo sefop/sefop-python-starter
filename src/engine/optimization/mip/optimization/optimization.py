@@ -19,6 +19,7 @@ from engine.optimization.mip.optimization.model_abstraction.optimization_model i
 from engine.optimization.mip.optimization.solvers.base_technology_solver import BaseTechnologySolver
 from engine.optimization.mip.optimization.solvers.highs_solver import HighsSolver
 from engine.preprocessing.pre_processed_data import PreProcessedData
+from domain.product import Product
 from domain.recommendation import Recommendation
 from domain.request import Request
 
@@ -76,7 +77,7 @@ class Optimization:
         # Subphase 3: extract recommendation
         return self._extract_recommendation(request, solution.variable_values)
 
-    def _build_model(self, request) -> OptimizationModel:
+    def _build_model(self, request: Request) -> OptimizationModel:
         variables = VariableSelectProduct().build(request)
         weight_c = ConstraintLimitWeight().build(request)
         budget_c = ConstraintLimitBudget().build(request)
@@ -89,10 +90,12 @@ class Optimization:
             objective_sense=ObjectiveSense.MAXIMIZE,
         )
 
-    def _extract_recommendation(self, request, variable_values: dict[str, float]):
+    def _extract_recommendation(
+        self, request: Request, variable_values: dict[str, float]
+    ) -> Recommendation | None:
         """Convert solver variable values to a domain Recommendation."""
         product_map = {p.name: p for p in request.products}
-        quantities = {}
+        quantities: dict[Product, int] = {}
         for name, value in variable_values.items():
             # Round to nearest integer” MIP solvers use floating-point arithmetic
             qty = int(round(value))

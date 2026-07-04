@@ -41,9 +41,6 @@ class HighsSolver(BaseTechnologySolver):
     objective -> ``changeColCost`` / ``changeObjectiveSense``.
     """
 
-    def __init__(self) -> None:
-        self._highs_model: highspy.Highs | None = None
-
     def solve(self, model: OptimizationModel) -> ModelSolution:
         """Translate and solve the model with HiGHS.
 
@@ -54,29 +51,29 @@ class HighsSolver(BaseTechnologySolver):
             ModelSolution with status and variable values, or None values
             if no feasible solution was found.
         """
-        self._highs_model = highspy.Highs()
+        highs_model = highspy.Highs()
 
         # Uncomment this if you don't want logs into the console.
-        # self._highs_model.silent()
+        # highs_model.silent()
 
         # Create the model in Highs
-        col_index = self._add_variables(model)
-        self._set_objective(model, col_index)
-        self._add_constraints(model, col_index)
+        col_index = self._add_variables(model, highs_model)
+        self._set_objective(model, col_index, highs_model)
+        self._add_constraints(model, col_index, highs_model)
 
         # Solve the model
-        self._highs_model.run()
-        status = self._highs_model.getModelStatus()
+        highs_model.run()
+        status = highs_model.getModelStatus()
         logger.info("HiGHS terminated with status: %s", status)
 
-        #
-        return self._build_solution(model, status)
+        return self._build_solution(model, status, highs_model)
 
-    def _add_variables(self, model: OptimizationModel) -> dict[str, int]:
+    def _add_variables(self, model: OptimizationModel, highs_model: highspy.Highs) -> dict[str, int]:
         """Add decision variables to the HiGHS model.
 
         Args:
             model: The solver-agnostic optimization model.
+            highs_model: The HiGHS model instance being built for this solve() call.
 
         Returns:
             Mapping from variable name to HiGHS column index, used to
@@ -85,44 +82,49 @@ class HighsSolver(BaseTechnologySolver):
         col_index: dict[str, int] = {}
         for i, var in enumerate(model.variables):
             ub = var.upper_bound if var.upper_bound is not None else highspy.kHighsInf
-            self._highs_model.addVar(var.lower_bound, ub)
+            highs_model.addVar(var.lower_bound, ub)
             if var.var_type in {VarType.INTEGER, VarType.BINARY}:
-                self._highs_model.changeColIntegrality(i, highspy.HighsVarType.kInteger)
+                highs_model.changeColIntegrality(i, highspy.HighsVarType.kInteger)
             col_index[var.name] = i
         return col_index
 
-    def _set_objective(self, model: OptimizationModel, col_index: dict[str, int]) -> None:
+    def _set_objective(self, model: OptimizationModel, col_index: dict[str, int], highs_model: highspy.Highs) -> None:
         """Set the objective function coefficients and optimization direction.
 
         Args:
             model: The solver-agnostic optimization model.
             col_index: Mapping from variable name to HiGHS column index.
+            highs_model: The HiGHS model instance being built for this solve() call.
         """
         for var_name, coeff in model.objective_expression.terms.items():
-            self._highs_model.changeColCost(col_index[var_name], coeff)
+            highs_model.changeColCost(col_index[var_name], coeff)
 
         sense = highspy.ObjSense.kMaximize if model.objective_sense == ObjectiveSense.MAXIMIZE else highspy.ObjSense.kMinimize
-        self._highs_model.changeObjectiveSense(sense)
+        highs_model.changeObjectiveSense(sense)
 
-    def _add_constraints(self, model: OptimizationModel, col_index: dict[str, int]) -> None:
+    def _add_constraints(self, model: OptimizationModel, col_index: dict[str, int], highs_model: highspy.Highs) -> None:
         """Add linear constraints to the HiGHS model.
 
         Args:
             model: The solver-agnostic optimization model.
             col_index: Mapping from variable name to HiGHS column index.
+            highs_model: The HiGHS model instance being built for this solve() call.
         """
         for constraint in model.constraints:
             indices = [col_index[name] for name in constraint.lhs.terms]
             coeffs = list(constraint.lhs.terms.values())
             row_lb, row_ub = self._get_row_bounds(constraint.sign, constraint.rhs)
-            self._highs_model.addRow(row_lb, row_ub, len(indices), np.array(indices, dtype=np.int32), np.array(coeffs, dtype=np.float64))
+            highs_model.addRow(row_lb, row_ub, len(indices), np.array(indices, dtype=np.int32), np.array(coeffs, dtype=np.float64))
 
-    def _build_solution(self, model: OptimizationModel, status: highspy.HighsModelStatus) -> ModelSolution:
+    def _build_solution(
+        self, model: OptimizationModel, status: highspy.HighsModelStatus, highs_model: highspy.Highs
+    ) -> ModelSolution:
         """Map the HiGHS result to a domain ModelSolution.
 
         Args:
             model: The solver-agnostic optimization model.
             status: The model status returned by HiGHS.
+            highs_model: The HiGHS model instance that was solved.
 
         Returns:
             ModelSolution with the appropriate status and variable values.
@@ -130,7 +132,7 @@ class HighsSolver(BaseTechnologySolver):
         if status not in _FEASIBLE_STATUSES:
             return ModelSolution(status=self._map_status(status), variable_values=None)
 
-        sol = self._highs_model.getSolution()
+        sol = highs_model.getSolution()
         values = {var.name: sol.col_value[i] for i, var in enumerate(model.variables)}
         return ModelSolution(status=SolutionStatus.OPTIMAL, variable_values=values)
 
