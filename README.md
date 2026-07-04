@@ -1,6 +1,6 @@
 # SEFOP - Python Starter
 
-**Reference implementation of [SEFOP](https://github.com/sefop) for Python**
+**Reference implementation of [SEFOP](https://github.com/sefop) for Python in a simplified manner**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue)](https://www.python.org/)
@@ -9,29 +9,29 @@
 
 ---
 
-## What problem does this solve?
+## Problem description
 
-Given a **budget** and a **weight limit**, pick the combination of products that **maximizes total calories**.
+This repo solves a knapsack problem. Given a **budget** and a **weight limit**, pick the combination of products that **maximizes total calories**.
 
-This is known as the Knapsack problem — a classic in operations research.
-
-### Example — [`data/2/data.json`](data/2/data.json)
+### Example — Data from [`data/2/data.json`](data/2/data.json)
 
 | Product   | Price  | Weight  | Calories |
 |-----------|--------|---------|----------|
 | Apple     | $1.00  | 0.50 kg | 100      |
 | Chocolate | $5.00  | 1.00 kg | 50       |
 
-**Constraints:** budget $10.00 · weight limit 2.00 kg
+**Constraints:** budget $10.00 and weight limit 2.00 kg
 
 **Optimal solution:**
-```
-Products selected:
-  apple        x4  (400 cal, $4.00, 2.00 kg)
-Total calories : 400
-Total cost     : $4.00
-Total weight   : 2.00 kg
-```
+
+| Product   | Units | Cost   | Weight  | Calories |
+|-----------|-------|--------|---------|----------|
+| Apple     | 4     | $4.00  | 2.00 kg | 400      |
+| Chocolate | 0     | $0.00  | 0.00 kg | 0        |
+
+| Total calories | Total cost / Budget | Total weight / Max weight |
+|-----------------|----------------------|----------------------------|
+| 400             | $4.00 / $10.00       | 2.00 kg / 2.00 kg          |
 
 The solver picks 4 apples — chocolate costs 10× more per calorie, so it never appears in the optimal solution.
 
@@ -63,7 +63,7 @@ git clone https://github.com/sefop/sefop-python-starter.git
 cd sefop-python-starter
 ```
 
-### 2. Create a virtual environment
+### 2. Create a virtual environment using Python 3.12
 ```bash
 py -3.12 -m venv .venv
 .venv\Scripts\activate  # On Windows
@@ -77,6 +77,8 @@ pip install -e .
 ```
 
 The `-e` flag installs the package in **editable mode**, making your source code directly importable. This is the standard Python development practice — no need to set `PYTHONPATH` or reinstall when you edit code.
+
+**What breaks if you skip this step?** `pytest` still works, since `pyproject.toml` adds `src` to the path just for pytest. But `python -m cli 1` will fail with an import error — `cli.py` imports `domain`, `engine`, etc. as top-level packages, and without the editable install Python has no way to find them under `src/` outside of pytest.
 
 ---
 
@@ -96,7 +98,6 @@ pytest -m "not integration"
 ```bash
 pytest -m integration
 ```
-
 
 ### Run tests by layer
 ```bash
@@ -131,16 +132,4 @@ This project demonstrates **Clean Architecture** applied to optimization:
 6. **`engine/postprocessing/`** — Refines the recommendation (e.g., sorts products by quantity)
 7. **`cli.py`** — Entry point that loads data and calls the solver
 
-The orchestrator automatically chooses the right solver based on problem size (≤50 products → MIP; larger → greedy).
-
 ---
-
-## Development workflow
-
-After `pip install -e .`, your code is live:
-- Edit any file in `src/` → changes are instant (no reinstall)
-- Run tests anytime: `pytest`
-- Run CLI anytime: `python -m cli 1`
-
----
-
