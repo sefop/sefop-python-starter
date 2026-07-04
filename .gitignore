@@ -219,5 +219,6 @@ __marimo__/
 
 # Agents stuff
 CLAUDE.md
-.claude/
-.docs/
+.claude/hooks
+
+
