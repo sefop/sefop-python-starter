@@ -9,6 +9,7 @@ Key design: strategy selection is based on problem size. Small problems (â‰¤
 products) use the exact MIP solver; larger problems use the fast greedy
 heuristic. This selection is hidden from callers.
 """
+
 from __future__ import annotations
 
 import logging

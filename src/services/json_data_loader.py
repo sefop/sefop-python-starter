@@ -4,6 +4,7 @@ This module is the only place in the codebase that knows about JSON files.
 The rest of the system talks to the abstract ``BaseDataLoader`` base class;
 this is one concrete implementation of it.
 """
+
 from __future__ import annotations
 
 import json

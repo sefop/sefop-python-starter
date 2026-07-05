@@ -29,9 +29,7 @@ def test__json_data_loader__when_valid_json__returns_request(tmp_path):
         "requestId": "1",
         "maxWeightKg": 1.0,
         "maxBudgetUsd": 5.0,
-        "products": [
-            {"name": "banana", "priceUsd": 1.00, "weightKg": 0.50, "calories": 100}
-        ],
+        "products": [{"name": "banana", "priceUsd": 1.00, "weightKg": 0.50, "calories": 100}],
     }
     _write_json(tmp_path, "1", payload)
     loader = JsonDataLoader(folder_path=str(tmp_path))
@@ -67,9 +65,7 @@ def test__json_data_loader__when_required_field_missing__raises_value_error(tmp_
     payload = {
         "requestId": "1",
         "maxWeightKg": 1.0,
-        "products": [
-            {"name": "banana", "priceUsd": 1.00, "weightKg": 0.50, "calories": 100}
-        ],
+        "products": [{"name": "banana", "priceUsd": 1.00, "weightKg": 0.50, "calories": 100}],
     }
     _write_json(tmp_path, "1", payload)
     loader = JsonDataLoader(folder_path=str(tmp_path))
@@ -85,9 +81,7 @@ def test__json_data_loader__when_product_field_missing__raises_value_error(tmp_p
         "requestId": "1",
         "maxWeightKg": 1.0,
         "maxBudgetUsd": 5.0,
-        "products": [
-            {"name": "banana", "priceUsd": 1.00, "calories": 100}  # weightKg omitted
-        ],
+        "products": [{"name": "banana", "priceUsd": 1.00, "calories": 100}],  # weightKg omitted
     }
     _write_json(tmp_path, "1", payload)
     loader = JsonDataLoader(folder_path=str(tmp_path))

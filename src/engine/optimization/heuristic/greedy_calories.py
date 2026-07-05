@@ -4,6 +4,7 @@ Products are ranked by calorie density (calories per kg). The algorithm
 works through the ranked list and takes as many units of each product as
 the remaining weight and budget allow.
 """
+
 from __future__ import annotations
 
 from math import floor

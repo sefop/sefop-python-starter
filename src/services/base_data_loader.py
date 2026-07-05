@@ -4,6 +4,7 @@ The optimization service loads input data through this interface, so the
 source of data (Excel file, database, REST API, etc.) can change without
 modifying the optimization logic itself.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

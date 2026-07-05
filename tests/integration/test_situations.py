@@ -19,10 +19,7 @@ _RESOURCES_DIR = Path(__file__).parent.parent / "resources"
 
 
 def _run_cli(
-    situation: str,
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture
+    situation: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
 ) -> tuple[Path, int]:
     """Run cli.main() against a named situation folder.
 

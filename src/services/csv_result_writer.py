@@ -8,6 +8,7 @@ WHY THIS EXISTS:
     chosen because CSV and plain text need no dependency beyond Python's
     standard library.
 """
+
 from __future__ import annotations
 
 import csv
@@ -52,9 +53,7 @@ class CsvResultWriter(BaseResultWriter):
 
         # message is None on success, so fall back to an empty string rather
         # than writing the literal text "None" into the file.
-        (run_folder / "status.txt").write_text(
-            f"{response.status}\n{response.message or ''}\n", encoding="utf-8"
-        )
+        (run_folder / "status.txt").write_text(f"{response.status}\n{response.message or ''}\n", encoding="utf-8")
 
         if response.recommendation is not None:
             self._write_solution_csv(run_folder / "solution.csv", response.recommendation)

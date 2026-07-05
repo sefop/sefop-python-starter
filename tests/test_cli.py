@@ -11,6 +11,7 @@ WHY THIS EXISTS:
     directory. This file covers exactly that fallback path so it isn't lost
     once the flag-based behavior is fully covered elsewhere.
 """
+
 import json
 from pathlib import Path
 

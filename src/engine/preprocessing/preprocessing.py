@@ -38,8 +38,8 @@ class PreProcess:
             products that can physically fit within the constraints.
         """
         feasible_products = [
-            p for p in request.products
-            if p.price_usd <= request.max_budget_usd
-            and p.weight_kg <= request.max_weight_kg
+            p
+            for p in request.products
+            if p.price_usd <= request.max_budget_usd and p.weight_kg <= request.max_weight_kg
         ]
         return PreProcessedData(request=request, feasible_products=feasible_products)

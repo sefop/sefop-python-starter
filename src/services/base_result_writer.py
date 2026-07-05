@@ -13,6 +13,7 @@ WHERE IMPLEMENTATIONS LIVE:
     Concrete writers live alongside this file in src/services/, e.g.
     csv_result_writer.py.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

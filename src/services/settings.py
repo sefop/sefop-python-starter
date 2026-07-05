@@ -4,6 +4,7 @@ All configuration lives here, in one place, rather than scattered as literal
 strings across the codebase. A data scientist forking this repository to
 point at their own data or output folder only needs to edit this one file.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

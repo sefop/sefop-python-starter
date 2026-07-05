@@ -42,9 +42,7 @@ class Optimization:
 
     def __init__(self, solver_name: str = "highs") -> None:
         if solver_name not in _SOLVER_REGISTRY:
-            raise ValueError(
-                f"Unknown solver '{solver_name}'. Available: {list(_SOLVER_REGISTRY.keys())}"
-            )
+            raise ValueError(f"Unknown solver '{solver_name}'. Available: {list(_SOLVER_REGISTRY.keys())}")
         self._solver: BaseTechnologySolver = _SOLVER_REGISTRY[solver_name]()
 
     def run(self, preprocessed_data: PreProcessedData) -> Recommendation | None:
@@ -90,9 +88,7 @@ class Optimization:
             objective_sense=ObjectiveSense.MAXIMIZE,
         )
 
-    def _extract_recommendation(
-        self, request: Request, variable_values: dict[str, float]
-    ) -> Recommendation | None:
+    def _extract_recommendation(self, request: Request, variable_values: dict[str, float]) -> Recommendation | None:
         """Convert solver variable values to a domain Recommendation."""
         product_map = {p.name: p for p in request.products}
         quantities: dict[Product, int] = {}

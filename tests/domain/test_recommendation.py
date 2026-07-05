@@ -25,7 +25,7 @@ def test__recommendation__given_valid_inputs__computes_totals_correctly(picnic_r
     rec = Recommendation(request=picnic_request, quantities={banana: 2, chips: 1})
 
     # ASSERT
-    assert rec.total_calories == 2 * 89 + 1 * 150   # 328
+    assert rec.total_calories == 2 * 89 + 1 * 150  # 328
     assert rec.total_cost_usd == pytest.approx(2 * 0.5 + 1 * 1.0)  # 2.0
     assert rec.total_weight_kg == pytest.approx(2 * 0.12 + 1 * 0.2)  # 0.44
 

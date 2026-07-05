@@ -65,10 +65,6 @@ class Recommendation:
         # Re-validate against the originating Request's limits so a Recommendation that
         # overspends the budget or exceeds the weight limit can never exist.
         if cost > self.request.max_budget_usd:
-            raise ValueError(
-                f"total cost {cost} exceeds budget {self.request.max_budget_usd}"
-            )
+            raise ValueError(f"total cost {cost} exceeds budget {self.request.max_budget_usd}")
         if weight > self.request.max_weight_kg:
-            raise ValueError(
-                f"total weight {weight} exceeds limit {self.request.max_weight_kg}"
-            )
+            raise ValueError(f"total weight {weight} exceeds limit {self.request.max_weight_kg}")

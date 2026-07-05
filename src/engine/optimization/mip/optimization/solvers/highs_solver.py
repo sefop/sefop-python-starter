@@ -99,7 +99,11 @@ class HighsSolver(BaseTechnologySolver):
         for var_name, coeff in model.objective_expression.terms.items():
             highs_model.changeColCost(col_index[var_name], coeff)
 
-        sense = highspy.ObjSense.kMaximize if model.objective_sense == ObjectiveSense.MAXIMIZE else highspy.ObjSense.kMinimize
+        sense = (
+            highspy.ObjSense.kMaximize
+            if model.objective_sense == ObjectiveSense.MAXIMIZE
+            else highspy.ObjSense.kMinimize
+        )
         highs_model.changeObjectiveSense(sense)
 
     def _add_constraints(self, model: OptimizationModel, col_index: dict[str, int], highs_model: highspy.Highs) -> None:
@@ -114,7 +118,9 @@ class HighsSolver(BaseTechnologySolver):
             indices = [col_index[name] for name in constraint.lhs.terms]
             coeffs = list(constraint.lhs.terms.values())
             row_lb, row_ub = self._get_row_bounds(constraint.sign, constraint.rhs)
-            highs_model.addRow(row_lb, row_ub, len(indices), np.array(indices, dtype=np.int32), np.array(coeffs, dtype=np.float64))
+            highs_model.addRow(
+                row_lb, row_ub, len(indices), np.array(indices, dtype=np.int32), np.array(coeffs, dtype=np.float64)
+            )
 
     def _build_solution(
         self, model: OptimizationModel, status: highspy.HighsModelStatus, highs_model: highspy.Highs

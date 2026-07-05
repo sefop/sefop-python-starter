@@ -5,6 +5,7 @@ rather than a raw ``Recommendation``. This gives callers a uniform object
 to inspect: check ``status``, read the ``recommendation`` on success, or
 read the ``message`` on failure — no exception handling required.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

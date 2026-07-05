@@ -23,7 +23,5 @@ class PostProcess:
         makes the output deterministic and easier to read — the product you
         picked the most of appears first.
         """
-        sorted_quantities = dict(
-            sorted(recommendation.quantities.items(), key=lambda item: item[1], reverse=True)
-        )
+        sorted_quantities = dict(sorted(recommendation.quantities.items(), key=lambda item: item[1], reverse=True))
         return Recommendation(request=recommendation.request, quantities=sorted_quantities)

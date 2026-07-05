@@ -135,6 +135,25 @@ pytest tests/engine/          # engine, strategies, pre/postprocessing tests
 
 ---
 
+## Code quality
+
+CI runs two checks before the test suite; both are fast, so run them locally before pushing to avoid a red PR.
+
+### Format check (black)
+```bash
+black --check src tests   # verify formatting only, no changes written
+black src tests           # reformat in place
+```
+Configuration (line length, target Python version) lives in `pyproject.toml`'s `[tool.black]` section, so the local command and CI always agree.
+
+### Type check (mypy)
+```bash
+mypy
+```
+Configuration lives in `pyproject.toml`'s `[tool.mypy]` section.
+
+---
+
 ## Usage
 
 ### Solve a knapsack optimization request from the CLI (command line interface)

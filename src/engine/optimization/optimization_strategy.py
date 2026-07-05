@@ -4,6 +4,7 @@ Strategies (MIP solver, greedy heuristic, etc.) are pluggable implementations
 of this interface so Orchestrator can select and run any of them through a single
 ``solve()`` call without knowing which one it picked.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

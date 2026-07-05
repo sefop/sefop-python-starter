@@ -11,6 +11,7 @@ Run with:
 Example:
     python -m cli 1
 """
+
 from __future__ import annotations
 
 import argparse
@@ -24,9 +25,7 @@ from services.settings import Settings
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Solve a knapsack optimization request given some data"
-    )
+    parser = argparse.ArgumentParser(description="Solve a knapsack optimization request given some data")
     parser.add_argument(
         "request_id",
         help="ID of the request to solve (must match a subfolder under the data/ directory).",
