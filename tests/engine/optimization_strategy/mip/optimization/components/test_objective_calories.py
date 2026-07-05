@@ -1,7 +1,9 @@
-﻿import pytest
+import pytest
 from domain.product import Product
 from domain.request import Request
 from engine.optimization.mip.optimization.components.objective_calories import ObjectiveCalories
+from engine.optimization.mip.optimization.model_abstraction.linear_expression import LinearExpression
+from engine.optimization.mip.optimization.optimization import Optimization
 
 
 @pytest.fixture
@@ -14,24 +16,16 @@ def chips() -> Product:
     return Product(name="chips", price_usd=1.0, weight_kg=0.2, calories=150)
 
 
-def test__objective_calories__each_product_contributes_its_calories(banana, chips):
+def test__objective_calories__matches_expected_expression(banana, chips):
     # ARRANGE
     request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana, chips])
+    expected = LinearExpression()
+    expected.add(banana.calories, Optimization.variable_name(banana.name))
+    expected.add(chips.calories, Optimization.variable_name(chips.name))
 
     # ACT
-    expression = ObjectiveCalories().build_expression(request)
+    expression = ObjectiveCalories().build_expression(request, name_fn=Optimization.variable_name)
 
-    # ASSERT
-    assert expression.terms["banana"] == pytest.approx(89.0)
-    assert expression.terms["chips"] == pytest.approx(150.0)
-
-
-def test__objective_calories__given_name_fn__applies_it_to_term_keys(banana):
-    # ARRANGE
-    request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
-
-    # ACT
-    expression = ObjectiveCalories().build_expression(request, name_fn=lambda name: f"quantity_{name}")
-
-    # ASSERT
-    assert expression.terms["quantity_banana"] == pytest.approx(89.0)
+    # ASSERT — pytest.approx handles the whole terms dict, avoiding
+    # exact-== comparison on the underlying float coefficients.
+    assert expression.terms == pytest.approx(expected.terms)

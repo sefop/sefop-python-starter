@@ -10,19 +10,13 @@ from collections.abc import Callable
 from engine.optimization.mip.optimization.model_abstraction.linear_expression import LinearExpression
 from domain.request import Request
 
-# Scaling factor for the calorie term in the objective function.
-# At 1.0, calories are measured as raw kcal. Adjust to tune relative importance
-# if additional objective terms are added in future.
-CALORIES_WEIGHT = 1.0
-
 
 class ObjectiveCalories:
     """Objective function that maximises total calories:
 
-        α · ∑(i) calories_i · x_i
+        ∑(i) calories_i · x_i
 
-    Where x_i is the number of units of product i selected and
-    α is CALORIES_WEIGHT (1.0).
+    Where x_i is the number of units of product i selected.
     """
 
     def build_expression(self, request: Request, name_fn: Callable[[str], str] = lambda name: name) -> LinearExpression:
@@ -40,5 +34,5 @@ class ObjectiveCalories:
         """
         expr = LinearExpression()
         for p in request.products:
-            expr.add(CALORIES_WEIGHT * p.calories, name_fn(p.name))
+            expr.add(p.calories, name_fn(p.name))
         return expr

@@ -1,8 +1,10 @@
-﻿import pytest
+import pytest
 from domain.product import Product
 from domain.request import Request
 from engine.optimization.mip.optimization.components.constraint_limit_budget import ConstraintLimitBudget
-from engine.optimization.mip.optimization.model_abstraction.linear_constraint import ConstraintSign
+from engine.optimization.mip.optimization.model_abstraction.linear_constraint import ConstraintSign, LinearConstraint
+from engine.optimization.mip.optimization.model_abstraction.linear_expression import LinearExpression
+from engine.optimization.mip.optimization.optimization import Optimization
 
 
 @pytest.fixture
@@ -15,36 +17,23 @@ def chips() -> Product:
     return Product(name="chips", price_usd=1.0, weight_kg=0.2, calories=150)
 
 
-def test__constraint_limit_budget__rhs_equals_max_budget(banana):
-    # ARRANGE
-    request = Request(max_weight_kg=5.0, max_budget_usd=7.5, products=[banana])
-
-    # ACT
-    constraint = ConstraintLimitBudget().build(request)
-
-    # ASSERT
-    assert constraint.rhs == 7.5
-    assert constraint.sign == ConstraintSign.LEQ
-
-
-def test__constraint_limit_budget__each_product_contributes_its_price(banana, chips):
+def test__constraint_limit_budget__matches_expected_constraint(banana, chips):
     # ARRANGE
     request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana, chips])
+    expected_lhs = LinearExpression()
+    expected_lhs.add(banana.price_usd, Optimization.variable_name(banana.name))
+    expected_lhs.add(chips.price_usd, Optimization.variable_name(chips.name))
+    expected = LinearConstraint(
+        name="budget_limit", lhs=expected_lhs, sign=ConstraintSign.LEQ, rhs=request.max_budget_usd
+    )
 
     # ACT
-    constraint = ConstraintLimitBudget().build(request)
+    constraint = ConstraintLimitBudget().build(request, name_fn=Optimization.variable_name)
 
-    # ASSERT
-    assert constraint.lhs.terms["banana"] == pytest.approx(0.5)
-    assert constraint.lhs.terms["chips"] == pytest.approx(1.0)
-
-
-def test__constraint_limit_budget__given_name_fn__applies_it_to_term_keys(banana):
-    # ARRANGE
-    request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
-
-    # ACT
-    constraint = ConstraintLimitBudget().build(request, name_fn=lambda name: f"quantity_{name}")
-
-    # ASSERT
-    assert constraint.lhs.terms["quantity_banana"] == pytest.approx(0.5)
+    # ASSERT — compared field-by-field, not with `==` on the whole object,
+    # so float fields (rhs, term coefficients) go through pytest.approx
+    # rather than exact equality.
+    assert constraint.name == expected.name
+    assert constraint.sign == expected.sign
+    assert constraint.rhs == pytest.approx(expected.rhs)
+    assert constraint.lhs.terms == pytest.approx(expected.lhs.terms)
