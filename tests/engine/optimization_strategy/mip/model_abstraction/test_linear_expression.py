@@ -41,7 +41,7 @@ def test__linear_expression__terms__returns_copy():
     expr = LinearExpression()
     expr.add(1.0, "banana")
 
-    # ACT â€” mutating the returned dict must not affect the expression
+    # ACT — mutating the returned dict must not affect the expression
     snapshot = expr.terms
     snapshot["banana"] = 999.0
 

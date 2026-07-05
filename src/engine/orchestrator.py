@@ -1,11 +1,11 @@
 ﻿"""Orchestrates the knapsack optimization pipeline.
 
 The Orchestrator is the public face of the optimization package. Given a Request,
-it orchestrates three explicit stages: preprocessing â†’ strategy selection and
-solving â†’ postprocessing. Returns a Recommendation or None. Callers never need
+it orchestrates three explicit stages: preprocessing → strategy selection and
+solving → postprocessing. Returns a Recommendation or None. Callers never need
 to know which strategy was chosen or how preprocessing/postprocessing work.
 
-Key design: strategy selection is based on problem size. Small problems (â‰¤50
+Key design: strategy selection is based on problem size. Small problems (≤50
 products) use the exact MIP solver; larger problems use the fast greedy
 heuristic. This selection is hidden from callers.
 """

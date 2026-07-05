@@ -2,7 +2,7 @@
 
 The optimization orchestrator in ``optimization.py`` talks to solvers only
 through this interface. That means you can swap HiGHS for any future solver
-without changing the optimization logic â€” just provide a new subclass.
+without changing the optimization logic — just provide a new subclass.
 """
 
 from __future__ import annotations

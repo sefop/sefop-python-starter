@@ -2,7 +2,7 @@
 
 HiGHS is an open-source, high-performance solver for LP and MIP problems.
 This class translates an OptimizationModel into the highspy Python API
-directly â€” no Pyomo dependency. It is the only file in this project that
+directly — no Pyomo dependency. It is the only file in this project that
 imports highspy.
 """
 
@@ -146,8 +146,8 @@ class HighsSolver(BaseTechnologySolver):
     def _get_row_bounds(sign: ConstraintSign, rhs: float) -> tuple[float, float]:
         """Translate a constraint sign into the (row_lb, row_ub) pair HiGHS expects.
 
-        HiGHS represents all constraints as range rows: lb â‰¤ expr â‰¤ ub.
-        One-sided constraints use Â±infinity as the inactive bound.
+        HiGHS represents all constraints as range rows: lb ≤ expr ≤ ub.
+        One-sided constraints use ±infinity as the inactive bound.
 
         Args:
             sign: The constraint comparison operator.

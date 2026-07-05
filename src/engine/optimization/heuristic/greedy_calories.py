@@ -17,7 +17,7 @@ from domain.recommendation import Recommendation
 class GreedyCalories(OptimizationStrategy):
     """Greedy knapsack solver that prioritizes calorie-dense products.
 
-    This is a *heuristic* â€” it does not guarantee the mathematically
+    This is a *heuristic* — it does not guarantee the mathematically
     optimal solution, but it runs in linear time and produces good results
     in practice for the calorie-maximization objective.
     """

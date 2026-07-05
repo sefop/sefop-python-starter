@@ -2,7 +2,7 @@
 
 Assembles variables, constraints, and objective into a single object that
 ``BaseTechnologySolver`` implementations consume.
-Pure Python stdlib only â€” no solver dependency.
+Pure Python stdlib only — no solver dependency.
 """
 
 from __future__ import annotations

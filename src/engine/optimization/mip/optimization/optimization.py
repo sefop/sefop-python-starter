@@ -4,7 +4,7 @@ Assembles the OptimizationModel from components, delegates solving to
 BaseTechnologySolver, and extracts a domain Recommendation from the solution.
 
 Typical call chain:
-    MipStrategy.solve() â†’ PreProcess â†’ **this module** â†’ PostProcess
+    MipStrategy.solve() → PreProcess → **this module** → PostProcess
 """
 
 from __future__ import annotations

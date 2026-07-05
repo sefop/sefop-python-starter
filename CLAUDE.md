@@ -12,16 +12,7 @@
   can understand this repository.
 - The project should be designed in such a way that it is easy to fork and reuse.
 
-## Design Philosophy
+## Coding rules
 
-Guided by "A Philosophy of Software Design" (Ousterhout):
-
-- **Complexity is the enemy.** Minimize unnecessary complexity through clear interfaces and information hiding.
-- **Invest in design upfront.** Strategic programming: spend time on clean abstractions now to avoid patchy workarounds later.
-- **Design for the common case.** Optimize the expected usage pattern; handle edge cases without complicating the happy path.
-
-Red flags that signal design problems: shallow modules, information leakage between layers, pass-through methods that add no value, and generic data containers that force callers to understand details.
-
-## Code quality rules
-
-- Never compare floats with `==` or `!=`; use `math.isclose()` instead (Python:S1244).
+- Never compare floats with `==` or `!=`; use `math.isclose()` instead.
+- All code must comply with `black` (formatting) and `mypy` (static type checking); run `black src tests` and `mypy` before considering any change done. Configuration for both lives in `pyproject.toml`.
