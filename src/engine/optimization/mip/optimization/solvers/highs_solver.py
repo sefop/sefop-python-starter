@@ -96,6 +96,9 @@ class HighsSolver(BaseTechnologySolver):
         for i, var in enumerate(model.variables):
             ub = var.upper_bound if var.upper_bound is not None else highspy.kHighsInf
             highs_model.addVar(var.lower_bound, ub)
+            # Without this, HiGHS defaults to generic labels ("c0", "c1", ...)
+            # for every column, which makes the model.lp dump unreadable.
+            highs_model.passColName(i, var.name)
             if var.var_type in {VarType.INTEGER, VarType.BINARY}:
                 highs_model.changeColIntegrality(i, highspy.HighsVarType.kInteger)
             col_index[var.name] = i
@@ -127,13 +130,16 @@ class HighsSolver(BaseTechnologySolver):
             col_index: Mapping from variable name to HiGHS column index.
             highs_model: The HiGHS model instance being built for this solve() call.
         """
-        for constraint in model.constraints:
+        for row_index, constraint in enumerate(model.constraints):
             indices = [col_index[name] for name in constraint.lhs.terms]
             coeffs = list(constraint.lhs.terms.values())
             row_lb, row_ub = self._get_row_bounds(constraint.sign, constraint.rhs)
             highs_model.addRow(
                 row_lb, row_ub, len(indices), np.array(indices, dtype=np.int32), np.array(coeffs, dtype=np.float64)
             )
+            # Without this, HiGHS defaults to generic labels ("r0", "r1", ...)
+            # for every row, which makes the model.lp dump unreadable.
+            highs_model.passRowName(row_index, constraint.name)
 
     def _build_solution(
         self, model: OptimizationModel, status: highspy.HighsModelStatus, highs_model: highspy.Highs

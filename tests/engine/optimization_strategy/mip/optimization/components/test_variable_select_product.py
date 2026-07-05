@@ -47,3 +47,15 @@ def test__variable_select_product__lower_bound_is_zero(banana):
 
     # ASSERT
     assert all(v.lower_bound == 0.0 for v in variables)
+
+
+def test__variable_select_product__given_name_fn__applies_it_to_variable_names(banana, chips):
+    # ARRANGE
+    request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana, chips])
+
+    # ACT
+    variables = VariableSelectProduct().build(request, name_fn=lambda name: f"select_{name}")
+
+    # ASSERT
+    names = {v.name for v in variables}
+    assert names == {"select_banana", "select_chips"}

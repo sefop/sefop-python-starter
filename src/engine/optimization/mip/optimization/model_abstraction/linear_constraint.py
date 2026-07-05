@@ -26,6 +26,9 @@ class LinearConstraint:
 
     Attributes:
         name: Unique identifier for the constraint (used in solver output).
+            Must contain only letters, digits, and underscores; this is
+            enforced once, when the constraint is assembled into an
+            ``OptimizationModel``, not here.
         lhs: Left-hand side linear expression.
         sign: Comparison operator.
         rhs: Right-hand side scalar value.

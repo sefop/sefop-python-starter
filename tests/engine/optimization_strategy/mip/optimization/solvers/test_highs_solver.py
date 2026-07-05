@@ -42,3 +42,16 @@ def test__solve__given_no_output_dir__writes_no_lp_file(tiny_model, tmp_path, mo
 
     # ASSERT
     assert list(tmp_path.rglob("*.lp")) == []
+
+
+def test__solve__given_output_dir__lp_file_uses_domain_names_not_generic_labels(tiny_model, tmp_path):
+    # ACT
+    HighsSolver().solve(tiny_model, output_dir=tmp_path)
+
+    # ASSERT — HiGHS defaults to generic c0/r0 labels for unnamed columns/rows;
+    # the domain model's actual names ("x", "cap") must appear instead.
+    lp_text = (tmp_path / "model.lp").read_text(encoding="utf-8")
+    assert "x" in lp_text
+    assert "cap" in lp_text
+    assert "c0" not in lp_text
+    assert "r0" not in lp_text

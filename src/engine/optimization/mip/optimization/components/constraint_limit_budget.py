@@ -5,6 +5,8 @@ Pure Python stdlib only — no solver dependency.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from engine.optimization.mip.optimization.model_abstraction.linear_constraint import ConstraintSign, LinearConstraint
 from engine.optimization.mip.optimization.model_abstraction.linear_expression import LinearExpression
 from domain.request import Request
@@ -18,16 +20,20 @@ class ConstraintLimitBudget:
     Where x_i is the number of units of product i selected.
     """
 
-    def build(self, request: Request) -> LinearConstraint:
+    def build(self, request: Request, name_fn: Callable[[str], str] = lambda name: name) -> LinearConstraint:
         """Build the budget constraint for the given request.
 
         Args:
             request: The knapsack request containing products and budget limit.
+            name_fn: Transforms a product name into the matching decision
+                variable's name. Defaults to the identity function; must match
+                whatever name_fn was used to build the variables themselves,
+                or the solver won't be able to find the referenced column.
 
         Returns:
             A LinearConstraint representing the budget capacity bound.
         """
         lhs = LinearExpression()
         for p in request.products:
-            lhs.add(p.price_usd, p.name)
+            lhs.add(p.price_usd, name_fn(p.name))
         return LinearConstraint(name="budget_limit", lhs=lhs, sign=ConstraintSign.LEQ, rhs=request.max_budget_usd)

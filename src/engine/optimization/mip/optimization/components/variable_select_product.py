@@ -6,6 +6,8 @@ Pure Python stdlib only — no solver dependency.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from engine.optimization.mip.optimization.model_abstraction.model_variable import ModelVariable, VarType
 from domain.request import Request
 
@@ -18,16 +20,21 @@ class VariableSelectProduct:
     the unbounded knapsack problem.
     """
 
-    def build(self, request: Request) -> list[ModelVariable]:
+    def build(self, request: Request, name_fn: Callable[[str], str] = lambda name: name) -> list[ModelVariable]:
         """Return one ModelVariable per product, keyed by product name.
 
         Args:
             request: The knapsack request whose products define the variables.
+            name_fn: Transforms a product name into the ModelVariable name.
+                Defaults to the identity function. Callers that need the
+                solver-facing name to differ from the raw product name (e.g.
+                Optimization, which prefixes it) inject their own function
+                here rather than this component hardcoding a convention.
 
         Returns:
             List of integer variables with lower_bound=0 and no upper bound.
         """
         return [
-            ModelVariable(name=p.name, var_type=VarType.INTEGER, lower_bound=0.0, upper_bound=None)
+            ModelVariable(name=name_fn(p.name), var_type=VarType.INTEGER, lower_bound=0.0, upper_bound=None)
             for p in request.products
         ]

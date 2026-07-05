@@ -23,6 +23,9 @@ class ModelVariable:
 
     Attributes:
         name: Unique identifier used to reference the variable in expressions.
+            Must contain only letters, digits, and underscores; this is
+            enforced once, when the variable is assembled into an
+            ``OptimizationModel``, not here.
         var_type: Integrality type of the variable.
         lower_bound: Minimum allowed value (default 0.0).
         upper_bound: Maximum allowed value; ``None`` means unbounded.

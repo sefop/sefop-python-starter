@@ -37,3 +37,14 @@ def test__constraint_limit_budget__each_product_contributes_its_price(banana, ch
     # ASSERT
     assert constraint.lhs.terms["banana"] == pytest.approx(0.5)
     assert constraint.lhs.terms["chips"] == pytest.approx(1.0)
+
+
+def test__constraint_limit_budget__given_name_fn__applies_it_to_term_keys(banana):
+    # ARRANGE
+    request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
+
+    # ACT
+    constraint = ConstraintLimitBudget().build(request, name_fn=lambda name: f"select_{name}")
+
+    # ASSERT
+    assert constraint.lhs.terms["select_banana"] == pytest.approx(0.5)

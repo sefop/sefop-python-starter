@@ -79,10 +79,16 @@ class Optimization:
         return self._extract_recommendation(request, solution.variable_values)
 
     def _build_model(self, request: Request) -> OptimizationModel:
-        variables = VariableSelectProduct().build(request)
-        weight_c = ConstraintLimitWeight().build(request)
-        budget_c = ConstraintLimitBudget().build(request)
-        objective = ObjectiveCalories().build_expression(request)
+        # Every component is handed self.variable_name so the whole model
+        # (variables, constraints, objective) agrees on one naming convention.
+        # The components can't apply this convention themselves: they're
+        # imported by this module, so importing Optimization back into them
+        # would be a circular import. Passing the function in as an argument
+        # sidesteps that entirely.
+        variables = VariableSelectProduct().build(request, name_fn=self.variable_name)
+        weight_c = ConstraintLimitWeight().build(request, name_fn=self.variable_name)
+        budget_c = ConstraintLimitBudget().build(request, name_fn=self.variable_name)
+        objective = ObjectiveCalories().build_expression(request, name_fn=self.variable_name)
         logger.info("Built model: %d products", len(variables))
         return OptimizationModel(
             variables=variables,
@@ -91,9 +97,23 @@ class Optimization:
             objective_sense=ObjectiveSense.MAXIMIZE,
         )
 
+    @staticmethod
+    def variable_name(product_name: str) -> str:
+        """Return the solver-facing variable name for a product's decision variable.
+
+        Prefixing with "select_" makes model.lp self-explanatory: a reader
+        immediately sees "select_banana" as the decision to select banana,
+        rather than a bare "banana" that could be confused with some other
+        variable kind referencing the same product if the model grows later.
+        """
+        return f"select_{product_name}"
+
     def _extract_recommendation(self, request: Request, variable_values: dict[str, float]) -> Recommendation | None:
         """Convert solver variable values to a domain Recommendation."""
-        product_map = {p.name: p for p in request.products}
+        # Keyed with the same variable_name() used to build the model, so a
+        # solved variable name maps straight back to its Product with no
+        # separate "strip the prefix" logic to keep in sync.
+        product_map = {self.variable_name(p.name): p for p in request.products}
         quantities: dict[Product, int] = {}
         for name, value in variable_values.items():
             # Round to nearest integer” MIP solvers use floating-point arithmetic
