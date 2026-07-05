@@ -2,6 +2,7 @@
 from domain.product import Product
 from domain.request import Request
 from engine.optimization.mip.optimization.components.constraint_limit_budget import ConstraintLimitBudget
+from engine.optimization.mip.optimization.model_abstraction.linear_constraint import ConstraintSign
 
 
 @pytest.fixture
@@ -23,7 +24,7 @@ def test__constraint_limit_budget__rhs_equals_max_budget(banana):
 
     # ASSERT
     assert constraint.rhs == 7.5
-    assert constraint.sign == "<="
+    assert constraint.sign == ConstraintSign.LEQ
 
 
 def test__constraint_limit_budget__each_product_contributes_its_price(banana, chips):

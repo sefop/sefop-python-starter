@@ -2,6 +2,7 @@
 from domain.product import Product
 from domain.request import Request
 from engine.optimization.mip.optimization.components.constraint_limit_weight import ConstraintLimitWeight
+from engine.optimization.mip.optimization.model_abstraction.linear_constraint import ConstraintSign
 
 
 @pytest.fixture
@@ -23,7 +24,7 @@ def test__constraint_limit_weight__rhs_equals_max_weight(banana):
 
     # ASSERT
     assert constraint.rhs == 3.5
-    assert constraint.sign == "<="
+    assert constraint.sign == ConstraintSign.LEQ
 
 
 def test__constraint_limit_weight__each_product_contributes_its_weight(banana, chips):
