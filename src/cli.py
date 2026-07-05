@@ -31,18 +31,33 @@ def main() -> None:
         "request_id",
         help="ID of the request to solve (must match a subfolder under the data/ directory).",
     )
+    parser.add_argument(
+        "--data-folder",
+        default=None,
+        help="Override the folder containing request subfolders (default: Settings().folder_path).",
+    )
+    parser.add_argument(
+        "--output-folder",
+        default=None,
+        help="Override the folder solutions are written to (default: Settings().output_folder_path).",
+    )
     args = parser.parse_args()
 
     settings = Settings()
-    loader = JsonDataLoader(folder_path=settings.folder_path)
-    writer = CsvResultWriter(output_folder_path=settings.output_folder_path)
+    # Command-line flags win over Settings so callers (including tests) can
+    # point at an arbitrary data/output location without editing Settings or
+    # changing the working directory.
+    data_folder = args.data_folder or settings.folder_path
+    output_folder = args.output_folder or settings.output_folder_path
+    loader = JsonDataLoader(folder_path=data_folder)
+    writer = CsvResultWriter(output_folder_path=output_folder)
     service = OptimizationService(request_loader=loader)
     response = service.solve(args.request_id)
 
     # The writer only knows how to copy a file, not where JsonDataLoader's
     # "{folder}/{request_id}/data.json" convention lives, so that path is
     # built here rather than inside the writer.
-    input_path = Path(settings.folder_path) / args.request_id / "data.json"
+    input_path = Path(data_folder) / args.request_id / "data.json"
     run_folder = writer.write(args.request_id, response, input_path)
     print(f"Results written to {run_folder}")
 

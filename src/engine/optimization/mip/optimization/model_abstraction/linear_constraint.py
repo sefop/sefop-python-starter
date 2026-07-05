@@ -1,7 +1,7 @@
 ﻿"""Solver-agnostic representation of a linear constraint.
 
-A LinearConstraint expresses: lhs sign rhs, e.g. âˆ‘(w_i Â· qty_i) â‰¤ W.
-Pure Python stdlib only â€” no solver dependency.
+A LinearConstraint expresses: lhs sign rhs, e.g. ∑(w_i · x_i) ≤ W.
+Pure Python stdlib only — no solver dependency.
 """
 
 from __future__ import annotations

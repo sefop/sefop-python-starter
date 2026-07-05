@@ -1,7 +1,7 @@
 ﻿"""Decision variables for product quantity selection.
 
-One non-negative integer variable per product: qty_i â‰¥ 0, integer.
-Pure Python stdlib only â€” no solver dependency.
+One non-negative integer variable per product: x_i ≥ 0, integer.
+Pure Python stdlib only — no solver dependency.
 """
 
 from __future__ import annotations
@@ -13,8 +13,8 @@ from domain.request import Request
 class VariableSelectProduct:
     """Creates one integer variable per product in the request.
 
-    The variable ``qty[product.name]`` represents how many units of that
-    product are selected. It is non-negative and integer â€” this formulates
+    The variable ``x[product.name]`` represents how many units of that
+    product are selected. It is non-negative and integer — this formulates
     the unbounded knapsack problem.
     """
 

@@ -1,6 +1,6 @@
 ﻿"""Budget capacity constraint for the knapsack MIP model.
 
-Pure Python stdlib only â€” no solver dependency.
+Pure Python stdlib only — no solver dependency.
 """
 
 from __future__ import annotations
@@ -13,9 +13,9 @@ from domain.request import Request
 class ConstraintLimitBudget:
     """Total cost of selected products must not exceed the budget:
 
-        âˆ‘(i) price_i Â· qty_i â‰¤ max_budget_usd
+        ∑(i) price_i · x_i ≤ max_budget_usd
 
-    Where qty_i is the number of units of product i selected.
+    Where x_i is the number of units of product i selected.
     """
 
     def build(self, request: Request) -> LinearConstraint:

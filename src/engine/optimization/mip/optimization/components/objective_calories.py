@@ -1,6 +1,6 @@
 ﻿"""Calorie-maximisation objective for the knapsack MIP model.
 
-Pure Python stdlib only â€” no solver dependency.
+Pure Python stdlib only — no solver dependency.
 """
 
 from __future__ import annotations
@@ -17,10 +17,10 @@ CALORIES_WEIGHT = 1.0
 class ObjectiveCalories:
     """Objective function that maximises total calories:
 
-        Î± Â· âˆ‘(i) calories_i Â· qty_i
+        α · ∑(i) calories_i · x_i
 
-    Where qty_i is the number of units of product i selected and
-    Î± is CALORIES_WEIGHT (1.0).
+    Where x_i is the number of units of product i selected and
+    α is CALORIES_WEIGHT (1.0).
     """
 
     def build_expression(self, request: Request) -> LinearExpression:

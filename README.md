@@ -13,6 +13,33 @@
 
 This repo solves a knapsack problem. Given a **budget** and a **weight limit**, pick the combination of products that **maximizes total calories**.
 
+### Mathematical formulation
+
+**Sets**
+- $I$: set of candidate products, indexed by $i \in I$
+
+**Parameters**
+- $\text{price}_i$, $\text{weight}_i$, $\text{calories}_i$: unit price (USD), unit weight (kg), and nutritional value of product $i \in I$
+- $B$: budget, in USD (`max_budget_usd`)
+- $W$: weight limit, in kg (`max_weight_kg`)
+
+**Decision variable**
+- $x_i \in \mathbb{Z}_{\ge 0}$ for each $i \in I$: number of units of product $i$ selected
+
+**Objective** — maximize total calories:
+
+$$\max \sum_{i \in I} \text{calories}_i \cdot x_i$$
+
+**Constraints**
+
+$$\sum_{i \in I} \text{price}_i \cdot x_i \le B \qquad \text{(budget)}$$
+
+$$\sum_{i \in I} \text{weight}_i \cdot x_i \le W \qquad \text{(weight limit)}$$
+
+$$x_i \in \mathbb{Z}_{\ge 0} \quad \forall i \in I \qquad \text{(non-negativity \& integrality)}$$
+
+Because $x_i$ has no upper bound, this is an **unbounded knapsack problem**: any number of units of a product may be chosen, which is why integrality must be enforced explicitly rather than relying on a 0/1 selection variable.
+
 ### Example — Data from [`data/2/data.json`](data/2/data.json)
 
 | Product   | Price  | Weight  | Calories |

@@ -1,6 +1,6 @@
 ﻿"""Weight capacity constraint for the knapsack MIP model.
 
-Pure Python stdlib only â€” no solver dependency.
+Pure Python stdlib only — no solver dependency.
 """
 
 from __future__ import annotations
@@ -13,9 +13,9 @@ from domain.request import Request
 class ConstraintLimitWeight:
     """Total weight of selected products must not exceed the weight limit:
 
-        âˆ‘(i) weight_i Â· qty_i â‰¤ max_weight_kg
+        ∑(i) weight_i · x_i ≤ max_weight_kg
 
-    Where qty_i is the number of units of product i selected.
+    Where x_i is the number of units of product i selected.
     """
 
     def build(self, request: Request) -> LinearConstraint:
