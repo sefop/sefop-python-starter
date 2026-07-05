@@ -1,31 +1,26 @@
 """Configuration values for the application.
 
-Configuration comes from the external environment (env vars, defaults).
-The rest of the application never reads environment variables directly — it
-reads from Settings instead, so configuration is centralized and easy to change.
+All configuration lives here, in one place, rather than scattered as literal
+strings across the codebase. A data scientist forking this repository to
+point at their own data or output folder only needs to edit this one file.
 """
 from __future__ import annotations
 
-import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
 class Settings:
     """Holds all configurable values for the application.
 
-    Each field reads from an environment variable first, falling back to a
-    sensible default. This means data scientists can point the CLI at a
-    different data folder without touching the code:
-
-        SEFOP_FOLDER_PATH=my_data python -m cli 1
+    Attributes:
+        folder_path: Root directory where request subfolders live
+            (data/1/data.json, data/2/data.json, …).
+        solver_name: Solver technology passed to the MIP strategy.
+        output_folder_path: Root directory each run's input and solution
+            files are written under (output/1/<timestamp>/, …).
     """
 
-    # Root directory where request subfolders live (data/1/data.json, data/2/data.json, …)
-    folder_path: str = field(
-        default_factory=lambda: os.environ.get("SEFOP_FOLDER_PATH", "data")
-    )
-    # Solver technology passed to the MIP strategy
-    solver_name: str = field(
-        default_factory=lambda: os.environ.get("SEFOP_SOLVER_NAME", "highs")
-    )
+    folder_path: str = "data"
+    solver_name: str = "highs"
+    output_folder_path: str = "output"

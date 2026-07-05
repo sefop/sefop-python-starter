@@ -220,4 +220,7 @@ __marimo__/
 # Agents stuff
 .claude/hooks
 
+# Generated run artifacts (see src/services/csv_result_writer.py)
+output/
+
 

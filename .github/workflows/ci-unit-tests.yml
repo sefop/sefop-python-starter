@@ -13,7 +13,7 @@
 #   - Fast feedback loop during development is valuable — so unit tests run on
 #     every commit/PR, while integration tests run separately (or on demand)
 #
-# This workflow runs on every push and PR to main.
+# This workflow runs on every push to main, and on every PR targeting main.
 # =============================================================================
 
 # What is this workflow called in the GitHub UI?
@@ -21,15 +21,31 @@ name: CI — Unit Tests
 
 # When should this workflow run?
 # This section answers: "what event triggers this automation?"
+#
+# Why is push restricted to main instead of every branch?
+#   A feature branch with an open PR satisfies BOTH `push` (any push to that
+#   branch) and `pull_request` (the PR's synchronize event) for the same
+#   commit. Without this restriction, every push to a branch that already
+#   has a PR open would trigger this workflow twice for the same commit.
+#   Restricting `push` to main means: pushes to main (e.g. after a merge)
+#   trigger it once via `push`, and commits on a feature branch trigger it
+#   once via `pull_request` — never both for the same commit.
 on:
-  # Trigger on every push to any branch
-  # Useful for: catching breakage immediately in feature branches
   push:
+    branches: [main]
 
   # Trigger on pull requests targeting main
   # Useful for: gating PRs on code quality; prevents merging broken code
   pull_request:
     branches: [main]
+
+# If a new commit is pushed to the same branch/PR while a previous run is
+# still in progress, cancel the older run instead of letting both finish.
+# Without this, quick successive pushes (or a force-push) would queue up
+# redundant runs for commits that are already superseded.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 # What are the jobs in this workflow?
 # A job is a set of steps that run on a clean virtual machine (called a runner).

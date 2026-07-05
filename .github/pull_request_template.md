@@ -1,6 +1,6 @@
 # What problem did you solve?
 
-Describe clearly what are you solving with this PR.
+Describe clearly what problem are you solving with this PR.
 
 # Describe the changes
 
