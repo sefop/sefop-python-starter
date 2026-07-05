@@ -1,9 +1,8 @@
 ﻿"""Mixed-Integer Programming (MIP) solver for the knapsack problem.
 
-This module contains the exact-optimisation solver. When the problem is small
+This module contains the exact-optimization solver. When the problem is small
 enough for MIP to solve in a reasonable time, this solver is preferred over
-the greedy heuristic because it guarantees an optimal (calorie-maximising)
-selection.
+the greedy heuristic because it guarantees an optimal selection.
 
 It plugs into the system as one of the solver strategies that Orchestrator can
 choose between (the other being GreedyCalories).
