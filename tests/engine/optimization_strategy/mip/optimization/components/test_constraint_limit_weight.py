@@ -44,7 +44,7 @@ def test__constraint_limit_weight__given_name_fn__applies_it_to_term_keys(banana
     request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
 
     # ACT
-    constraint = ConstraintLimitWeight().build(request, name_fn=lambda name: f"select_{name}")
+    constraint = ConstraintLimitWeight().build(request, name_fn=lambda name: f"quantity_{name}")
 
     # ASSERT
-    assert constraint.lhs.terms["select_banana"] == pytest.approx(0.12)
+    assert constraint.lhs.terms["quantity_banana"] == pytest.approx(0.12)

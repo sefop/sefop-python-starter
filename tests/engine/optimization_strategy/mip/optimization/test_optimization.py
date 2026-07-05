@@ -41,5 +41,5 @@ def test__run__given_output_dir__lp_file_uses_prefixed_variable_names(preprocess
 
     # ASSERT
     lp_text = (tmp_path / "model.lp").read_text(encoding="utf-8")
-    assert "select_banana" in lp_text
-    assert "select_chips" in lp_text
+    assert "quantity_banana" in lp_text
+    assert "quantity_chips" in lp_text

@@ -101,12 +101,14 @@ class Optimization:
     def variable_name(product_name: str) -> str:
         """Return the solver-facing variable name for a product's decision variable.
 
-        Prefixing with "select_" makes model.lp self-explanatory: a reader
-        immediately sees "select_banana" as the decision to select banana,
-        rather than a bare "banana" that could be confused with some other
-        variable kind referencing the same product if the model grows later.
+        Prefixing with "quantity_" makes model.lp self-explanatory: a reader
+        immediately sees "quantity_banana" as the number of units of banana
+        bought, rather than a bare "banana" that could be confused with some
+        other variable kind referencing the same product if the model grows
+        later. The variable is a general (unbounded) integer, not binary — it
+        counts units, it isn't a yes/no decision.
         """
-        return f"select_{product_name}"
+        return f"quantity_{product_name}"
 
     def _extract_recommendation(self, request: Request, variable_values: dict[str, float]) -> Recommendation | None:
         """Convert solver variable values to a domain Recommendation."""
