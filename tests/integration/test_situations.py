@@ -70,6 +70,9 @@ def test__cli_main__given_feasible_unique_optimum__returns_expected_optimal_calo
     assert exit_code == 0
     assert "SUCCESS" in (run_folder / "status.txt").read_text(encoding="utf-8")
     assert _read_totals(run_folder)["calories"] == 500
+    # The MIP path builds a HiGHS model, so its LP formulation should be
+    # dumped alongside the other run artifacts for inspection.
+    assert (run_folder / "model.lp").exists()
 
 
 @pytest.mark.integration
@@ -111,6 +114,8 @@ def test__cli_main__given_large_instance__triggers_heuristic_and_returns_feasibl
     assert totals["cost"] <= 20
     assert totals["weight"] <= 3.0
     assert totals["calories"] > 0
+    # The heuristic path never builds a HiGHS model, so no LP dump exists.
+    assert not (run_folder / "model.lp").exists()
 
 
 @pytest.mark.integration

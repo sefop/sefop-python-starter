@@ -6,6 +6,8 @@ returning a response, so callers don't need to manage those steps themselves.
 """
 
 import logging
+from datetime import datetime
+from pathlib import Path
 
 from services.base_data_loader import BaseDataLoader
 from services.optimization_response import OptimizationResponse
@@ -26,11 +28,20 @@ class OptimizationService:
         self._request_loader = request_loader
         self._orchestrator = Orchestrator()
 
-    def solve(self, request_id: str) -> OptimizationResponse:
+    def solve(
+        self, request_id: str, output_dir: Path | None = None, timestamp: datetime | None = None
+    ) -> OptimizationResponse:
         """Load a request and run the optimization pipeline.
 
         Args:
             request_id: Identifier of the request to solve.
+            output_dir: Directory to write solver debugging artifacts into,
+                or None to skip writing any. This service has no opinion on
+                where that directory lives — the caller (cli.py) resolves it
+                from Settings so this layer stays free of output-folder concerns.
+            timestamp: When this run started. Stamped onto the returned
+                response so the caller can later derive the same output
+                folder it computed output_dir from. Defaults to now.
 
         Returns:
             An OptimizationResponse with the recommendation or an error message.
@@ -40,12 +51,12 @@ class OptimizationService:
         request = self._request_loader.load(request_id)
         if request is None:
             logger.warning("Request not found: %s", request_id)
-            return OptimizationResponse.failure(f"Request '{request_id}' not found")
+            return OptimizationResponse.failure(f"Request '{request_id}' not found", timestamp=timestamp)
 
-        recommendation = self._orchestrator.solve(request)
+        recommendation = self._orchestrator.solve(request, output_dir)
         if recommendation is None:
             logger.warning("No feasible solution for request: %s", request_id)
-            return OptimizationResponse.failure("No feasible solution found")
+            return OptimizationResponse.failure("No feasible solution found", timestamp=timestamp)
 
         logger.info("--------- Request %s solved successfully ---------", request_id)
-        return OptimizationResponse.success(recommendation)
+        return OptimizationResponse.success(recommendation, timestamp=timestamp)

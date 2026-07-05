@@ -21,7 +21,11 @@ class OptimizationResponse:
     Attributes:
         recommendation: The knapsack recommendation, or None on failure.
         status: "SUCCESS" or "FAILURE".
-        timestamp: When the response was created.
+        timestamp: When this run started. Callers that need the on-disk
+            output folder to be predictable (e.g. cli.py, which creates that
+            folder before solving even begins) pin this value explicitly
+            rather than letting it default to the moment the response object
+            happens to be built.
         message: Error description on failure, None on success.
     """
 
@@ -31,11 +35,13 @@ class OptimizationResponse:
     message: str | None
 
     @classmethod
-    def success(cls, recommendation: Recommendation) -> "OptimizationResponse":
+    def success(cls, recommendation: Recommendation, timestamp: datetime | None = None) -> "OptimizationResponse":
         """Build a successful response wrapping the given recommendation.
 
         Args:
             recommendation: The optimization result to return.
+            timestamp: When this run started. Defaults to now if the caller
+                has no earlier timestamp to reuse.
 
         Returns:
             An OptimizationResponse with status "SUCCESS".
@@ -43,16 +49,18 @@ class OptimizationResponse:
         return cls(
             recommendation=recommendation,
             status="SUCCESS",
-            timestamp=datetime.now(),
+            timestamp=timestamp if timestamp is not None else datetime.now(),
             message=None,
         )
 
     @classmethod
-    def failure(cls, message: str) -> "OptimizationResponse":
+    def failure(cls, message: str, timestamp: datetime | None = None) -> "OptimizationResponse":
         """Build a failure response with an error description.
 
         Args:
             message: Human-readable explanation of what went wrong.
+            timestamp: When this run started. Defaults to now if the caller
+                has no earlier timestamp to reuse.
 
         Returns:
             An OptimizationResponse with status "FAILURE" and no recommendation.
@@ -60,6 +68,6 @@ class OptimizationResponse:
         return cls(
             recommendation=None,
             status="FAILURE",
-            timestamp=datetime.now(),
+            timestamp=timestamp if timestamp is not None else datetime.now(),
             message=message,
         )

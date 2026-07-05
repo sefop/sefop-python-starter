@@ -9,6 +9,7 @@ imports highspy.
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 import highspy
 import numpy as np
@@ -41,11 +42,17 @@ class HighsSolver(BaseTechnologySolver):
     objective -> ``changeColCost`` / ``changeObjectiveSense``.
     """
 
-    def solve(self, model: OptimizationModel) -> ModelSolution:
+    def solve(self, model: OptimizationModel, output_dir: Path | None = None) -> ModelSolution:
         """Translate and solve the model with HiGHS.
 
         Args:
             model: The solver-agnostic optimization model.
+            output_dir: If given, the built model is dumped as "model.lp" in
+                this directory before solving starts. This lets a data
+                scientist inspect the exact formulation HiGHS received —
+                useful when a solution looks wrong and the bug could be in
+                variable/constraint construction rather than in the solver
+                itself. Pass None (the default) to skip writing it.
 
         Returns:
             ModelSolution with status and variable values, or None values
@@ -60,6 +67,12 @@ class HighsSolver(BaseTechnologySolver):
         col_index = self._add_variables(model, highs_model)
         self._set_objective(model, col_index, highs_model)
         self._add_constraints(model, col_index, highs_model)
+
+        if output_dir is not None:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            # highspy infers the output format (LP vs MPS) from the file
+            # extension, so ".lp" is what selects the human-readable LP format.
+            highs_model.writeModel(str(output_dir / "model.lp"))
 
         # Solve the model
         highs_model.run()

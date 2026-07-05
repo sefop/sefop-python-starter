@@ -11,6 +11,7 @@ choose between (the other being GreedyCalories).
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 from engine.optimization.optimization_strategy import OptimizationStrategy
 from engine.preprocessing.pre_processed_data import PreProcessedData
@@ -30,16 +31,18 @@ class MipStrategy(OptimizationStrategy):
     def __init__(self, solver_name: str = "highs") -> None:
         self._optimization = Optimization(solver_name=solver_name)
 
-    def solve(self, data: PreProcessedData) -> Recommendation | None:
+    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Run the MIP Strategy.
 
         Args:
             data: The preprocessed knapsack data.
+            output_dir: Directory to write the HiGHS model's LP dump into, or
+                None to skip writing it. Forwarded to Optimization.run().
 
         Returns:
             The optimal Recommendation, or None if no feasible solution exists.
         """
-        recommendation = self._optimization.run(data)
+        recommendation = self._optimization.run(data, output_dir)
         if recommendation is None:
             logger.warning("MIP found no feasible solution")
             return None

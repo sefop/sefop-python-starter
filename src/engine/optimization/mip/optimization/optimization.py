@@ -10,6 +10,7 @@ Typical call chain:
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 from engine.optimization.mip.optimization.components.constraint_limit_budget import ConstraintLimitBudget
 from engine.optimization.mip.optimization.components.constraint_limit_weight import ConstraintLimitWeight
@@ -45,11 +46,13 @@ class Optimization:
             raise ValueError(f"Unknown solver '{solver_name}'. Available: {list(_SOLVER_REGISTRY.keys())}")
         self._solver: BaseTechnologySolver = _SOLVER_REGISTRY[solver_name]()
 
-    def run(self, preprocessed_data: PreProcessedData) -> Recommendation | None:
+    def run(self, preprocessed_data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Build model, solve, and extract recommendation.
 
         Args:
             preprocessed_data: Output of the preprocessing stage.
+            output_dir: Directory to write the built model's LP dump into, or
+                None to skip writing it. Forwarded to the solver unchanged.
 
         Returns:
             A Recommendation, or None if no feasible solution exists.
@@ -67,7 +70,7 @@ class Optimization:
         model = self._build_model(feasible_request)
 
         # Subphase 2: solve
-        solution = self._solver.solve(model)
+        solution = self._solver.solve(model, output_dir)
         logger.info("Solver status: %s", solution.status)
         if solution.variable_values is None:
             return None

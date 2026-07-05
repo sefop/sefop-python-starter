@@ -2,11 +2,13 @@
 ROLE: Implementation of BaseResultWriter that saves each run as plain files.
 
 WHY THIS EXISTS:
-    This module is the only place in the codebase that knows about output
-    folders, CSV files, or timestamps. The rest of the system talks to the
+    This module is the only place in the codebase that knows about CSV files
+    or the on-disk run folder layout. The rest of the system talks to the
     abstract BaseResultWriter; this is one concrete implementation of it,
     chosen because CSV and plain text need no dependency beyond Python's
-    standard library.
+    standard library. cli.py also needs TIMESTAMP_FORMAT: it must derive the
+    same run folder path before solving even starts (to hand it to the solver
+    for LP dumps), so the format is exported here rather than duplicated.
 """
 
 from __future__ import annotations
@@ -34,7 +36,7 @@ _CSV_HEADER = [
 # to the second. Two runs of the same request within the same second would
 # collide and overwrite each other, but that is accepted as a rare edge case
 # rather than guarded against, since real solves are invoked one at a time.
-_TIMESTAMP_FORMAT = "%Y_%m_%d_%H_%M_%S"
+TIMESTAMP_FORMAT = "%Y_%m_%d_%H_%M_%S"
 
 
 class CsvResultWriter(BaseResultWriter):
@@ -46,7 +48,7 @@ class CsvResultWriter(BaseResultWriter):
         self._output_folder_path = Path(output_folder_path)
 
     def write(self, request_id: str, response: OptimizationResponse, input_path: Path) -> Path:
-        run_folder = self._output_folder_path / request_id / response.timestamp.strftime(_TIMESTAMP_FORMAT)
+        run_folder = self._output_folder_path / request_id / response.timestamp.strftime(TIMESTAMP_FORMAT)
         run_folder.mkdir(parents=True, exist_ok=True)
 
         shutil.copy(input_path, run_folder / "input.json")

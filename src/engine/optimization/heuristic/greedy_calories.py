@@ -8,6 +8,7 @@ the remaining weight and budget allow.
 from __future__ import annotations
 
 from math import floor
+from pathlib import Path
 
 from engine.optimization.optimization_strategy import OptimizationStrategy
 from engine.preprocessing.pre_processed_data import PreProcessedData
@@ -22,11 +23,14 @@ class GreedyCalories(OptimizationStrategy):
     in practice for the calorie-maximization objective.
     """
 
-    def solve(self, data: PreProcessedData) -> Recommendation | None:
+    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Greedily select products ranked by calories per kg.
 
         Args:
             data: The preprocessed knapsack data with products and constraints.
+            output_dir: Unused. This heuristic builds no solver model, so it
+                has no debugging artifact to write; the parameter exists only
+                to satisfy the shared OptimizationStrategy interface.
 
         Returns:
             A Recommendation with the selected quantities, or None if no

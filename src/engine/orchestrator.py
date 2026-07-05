@@ -13,6 +13,7 @@ heuristic. This selection is hidden from callers.
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 from engine.optimization.optimization_strategy import OptimizationStrategy
 from engine.preprocessing.pre_processed_data import PreProcessedData
@@ -61,11 +62,14 @@ class Orchestrator:
         self._preprocessing = PreProcess()
         self._postprocessing = PostProcess()
 
-    def solve(self, request: Request) -> Recommendation | None:
+    def solve(self, request: Request, output_dir: Path | None = None) -> Recommendation | None:
         """Run the full optimization pipeline.
 
         Args:
             request: The knapsack request to solve.
+            output_dir: Directory to write solver debugging artifacts into,
+                or None to skip writing any. Forwarded to whichever strategy
+                is selected; ignored by strategies that produce none.
 
         Returns:
             The best Recommendation found, or None if no feasible solution exists.
@@ -77,7 +81,7 @@ class Orchestrator:
             logger.warning("No feasible products after preprocessing; skipping solve")
             return None
         optimization_strategy: OptimizationStrategy = _select_strategy(data)
-        result = optimization_strategy.solve(data)
+        result = optimization_strategy.solve(data, output_dir)
         if result is None:
             return None
         return self._postprocessing.run(result)

@@ -8,6 +8,7 @@ without changing the optimization logic — just provide a new subclass.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 from engine.optimization.mip.optimization.model_abstraction.model_solution import ModelSolution
 from engine.optimization.mip.optimization.model_abstraction.optimization_model import OptimizationModel
@@ -26,11 +27,15 @@ class BaseTechnologySolver(ABC):
     """
 
     @abstractmethod
-    def solve(self, model: OptimizationModel) -> ModelSolution:
+    def solve(self, model: OptimizationModel, output_dir: Path | None = None) -> ModelSolution:
         """Solve the given model and return a solution.
 
         Args:
             model: The solver-agnostic optimization model to solve.
+            output_dir: Directory to write solver debugging artifacts (e.g. an
+                LP dump of the model) into, or None to skip writing any. Not
+                every implementation produces artifacts; a solver that has
+                nothing to write may simply ignore this argument.
 
         Returns:
             A ModelSolution with status and variable values (or None if infeasible).

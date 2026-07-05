@@ -8,6 +8,7 @@ of this interface so Orchestrator can select and run any of them through a singl
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 from domain.recommendation import Recommendation
 from engine.preprocessing.pre_processed_data import PreProcessedData
@@ -24,11 +25,14 @@ class OptimizationStrategy(ABC):
     """
 
     @abstractmethod
-    def solve(self, data: PreProcessedData) -> Recommendation | None:
+    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Solve the optimization problem for the given data.
 
         Args:
             data: The preprocessed knapsack request and related context.
+            output_dir: Directory to write solver debugging artifacts into,
+                or None to skip writing any. Strategies that produce no such
+                artifacts (e.g. the greedy heuristic) simply ignore this.
 
         Returns:
             The best recommendation found, or None if no feasible solution exists.

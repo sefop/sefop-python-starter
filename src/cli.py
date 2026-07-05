@@ -16,11 +16,12 @@ from __future__ import annotations
 
 import argparse
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from services.optimization_service import OptimizationService
 from services.json_data_loader import JsonDataLoader
-from services.csv_result_writer import CsvResultWriter
+from services.csv_result_writer import TIMESTAMP_FORMAT, CsvResultWriter
 from services.settings import Settings
 
 
@@ -51,7 +52,15 @@ def main() -> None:
     loader = JsonDataLoader(folder_path=data_folder)
     writer = CsvResultWriter(output_folder_path=output_folder)
     service = OptimizationService(request_loader=loader)
-    response = service.solve(args.request_id)
+
+    # Captured before solving starts (rather than left to default inside the
+    # service) so this exact instant can be handed to the solver as the
+    # folder to dump model.lp into, and later reused by CsvResultWriter --
+    # both must agree on the same run folder without recomputing timestamps
+    # independently.
+    timestamp = datetime.now()
+    run_folder = Path(output_folder) / args.request_id / timestamp.strftime(TIMESTAMP_FORMAT)
+    response = service.solve(args.request_id, output_dir=run_folder, timestamp=timestamp)
 
     # The writer only knows how to copy a file, not where JsonDataLoader's
     # "{folder}/{request_id}/data.json" convention lives, so that path is
