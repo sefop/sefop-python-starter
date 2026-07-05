@@ -1,4 +1,4 @@
-﻿"""Calorie-maximisation objective for the knapsack MIP model.
+﻿"""Calorie-maximization objective for the knapsack MIP model.
 
 Pure Python stdlib only — no solver dependency.
 """
@@ -12,7 +12,7 @@ from domain.request import Request
 
 
 class ObjectiveCalories:
-    """Objective function that maximises total calories:
+    """Objective function that maximizes total calories:
 
         ∑(i) calories_i · x_i
 
@@ -30,7 +30,7 @@ class ObjectiveCalories:
                 or the solver won't be able to find the referenced column.
 
         Returns:
-            A LinearExpression to be maximised by the solver.
+            A LinearExpression to be maximized by the solver.
         """
         expr = LinearExpression()
         for p in request.products:
