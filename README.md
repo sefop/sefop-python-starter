@@ -125,6 +125,7 @@ pytest -m "not integration"
 ```bash
 pytest -m integration
 ```
+Each integration test drives the real CLI end-to-end against a pre-built "situation" (`tests/resources/<situation>/`) and checks two things: that the generated formulation (`model.lp`) matches a golden file, so an unintended change to the model is caught even though the formulation is otherwise only unit-tested in isolation; and situation-specific conditions on the outcome — e.g. the expected optimal calories, that an infeasible request exits non-zero and writes no solution, that tied optimal solutions still report the shared optimal total, or that a large instance correctly routes to the heuristic instead of the MIP solver.
 
 ### Run tests by layer
 ```bash
@@ -174,7 +175,7 @@ This project demonstrates **Clean Architecture** applied to optimization:
 4. **`engine/preprocessing/`** — Filters out products that can never be selected (individually infeasible)
 5. **`engine/optimization/`** — Solver implementations:
    - **Greedy heuristic** — fast, approximate solution for large problems
-   - **MIP solver** — exact optimal solution via HiGHS for small problems
+   - **MIP solver** — first assembles a **solver-agnostic model** (the formulation: variables, constraints, objective, in `model_abstraction/`, built from `components/`) using pure Python with no solver dependency. Only once that model exists is it handed to a technology-specific solver (`solvers/highs_solver.py`) to actually optimize. Because the formulation is a plain Python object, it can be unit-tested on its own — see `tests/engine/optimization_strategy/mip/model_abstraction/` and `.../components/` — independent of whether HiGHS or any other solver is installed.
 6. **`engine/postprocessing/`** — Refines the recommendation (e.g., sorts products by quantity)
 7. **`cli.py`** — Entry point that loads data and calls the solver
 
