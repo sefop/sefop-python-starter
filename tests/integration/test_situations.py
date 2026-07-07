@@ -20,18 +20,24 @@ _RESOURCES_DIR = Path(__file__).parent.parent / "resources"
 
 
 def _run_cli(
-    situation: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
+    situation: str,
+    integration_output_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture,
 ) -> tuple[Path, int]:
     """Run cli.main() against a named situation folder.
 
     Points --data-folder straight at tests/resources (no chdir needed) and
-    --output-folder at a fresh tmp_path, so situations never touch the real
-    data/ or output/ folders.
+    --output-folder at integration_output_root, the folder every situation
+    in this pytest session shares (see the integration_output_root fixture
+    in conftest.py), so situations never touch the real data/ or output/
+    folders used by production runs.
 
     Args:
         situation: Name of the subfolder under tests/resources/ to solve;
             doubles as the request_id passed to the CLI.
-        tmp_path: Pytest's per-test temporary directory, used as the output root.
+        integration_output_root: Session-scoped output root this run's
+            situations all write their CLI output under.
         monkeypatch: Used to substitute sys.argv for the duration of the call.
         capsys: Used to capture the "Results written to <path>" line the CLI prints.
 
@@ -40,7 +46,7 @@ def _run_cli(
     """
     monkeypatch.setattr(
         "sys.argv",
-        ["cli", situation, "--data-folder", str(_RESOURCES_DIR), "--output-folder", str(tmp_path / "output")],
+        ["cli", situation, "--data-folder", str(_RESOURCES_DIR), "--output-folder", str(integration_output_root)],
     )
     with pytest.raises(SystemExit) as exc_info:
         cli.main()
@@ -65,20 +71,32 @@ def _assert_model_lp_matches_golden(situation: str, run_folder: Path) -> None:
     """Assert the model.lp just produced matches tests/resources/<situation>/model.lp.
 
     To regenerate a golden file after an intentional formulation change, run
-    the CLI directly against the fixture and copy its model.lp over the golden:
-        python -m cli <situation> --data-folder tests/resources --output-folder <tmp_dir>
-        cp <tmp_dir>/<situation>/<timestamp>/model.lp tests/resources/<situation>/model.lp
+    the integration suite once, find the situation's run folder under
+    output/integration_tests/<session_timestamp>/<situation>/<response_timestamp>/,
+    and copy its model.lp over the golden:
+        pytest -m integration
+        cp output/integration_tests/<session_timestamp>/<situation>/<response_timestamp>/model.lp \\
+            tests/resources/<situation>/model.lp
     """
+    print("\n---------- LP Comparison ----------")
     golden = _RESOURCES_DIR / situation / "model.lp"
-    diffs = compare_lp(golden, run_folder / "model.lp")
-    assert diffs == [], diffs
+    diffs: list = compare_lp(golden, run_folder / "model.lp")
+
+    # Show a summary of the diffs first
+    print(f"There where {len(diffs)} differences.")
+    for diff in diffs:
+        print(diff)
+
+    assert len(diffs) == 0
 
 
 @pytest.mark.integration
-def test__cli_main__given_feasible_unique_optimum__returns_expected_optimal_calories(tmp_path, monkeypatch, capsys):
+def test__cli_main__given_feasible_unique_optimum__returns_expected_optimal_calories(
+    integration_output_root, monkeypatch, capsys
+):
     # ARRANGE / ACT — 1 protein_bar + 2 chips (500 cal, using the full budget)
     # beats every other combination that fits in budget=10/weight=5.
-    run_folder, exit_code = _run_cli("feasible_unique_optimum", tmp_path, monkeypatch, capsys)
+    run_folder, exit_code = _run_cli("feasible_unique_optimum", integration_output_root, monkeypatch, capsys)
 
     # ASSERT
     assert exit_code == 0
@@ -88,10 +106,12 @@ def test__cli_main__given_feasible_unique_optimum__returns_expected_optimal_calo
 
 
 @pytest.mark.integration
-def test__cli_main__given_infeasible__exits_nonzero_and_writes_no_solution(tmp_path, monkeypatch, capsys):
+def test__cli_main__given_infeasible__exits_nonzero_and_writes_no_solution(
+    integration_output_root, monkeypatch, capsys
+):
     # ARRANGE / ACT — the only product costs more than the entire budget, so
     # preprocessing filters it out and no recommendation exists.
-    run_folder, exit_code = _run_cli("infeasible", tmp_path, monkeypatch, capsys)
+    run_folder, exit_code = _run_cli("infeasible", integration_output_root, monkeypatch, capsys)
 
     # ASSERT
     assert exit_code == 1
@@ -100,11 +120,13 @@ def test__cli_main__given_infeasible__exits_nonzero_and_writes_no_solution(tmp_p
 
 
 @pytest.mark.integration
-def test__cli_main__given_multiple_optimal_solutions__returns_shared_optimal_calories(tmp_path, monkeypatch, capsys):
+def test__cli_main__given_multiple_optimal_solutions__returns_shared_optimal_calories(
+    integration_output_root, monkeypatch, capsys
+):
     # ARRANGE / ACT — cookie_a and cookie_b are interchangeable (same price,
     # weight, and calories), so either one alone is an optimal pick. Assert
     # only the shared optimal total, never which cookie the solver preferred.
-    run_folder, exit_code = _run_cli("multiple_optimal_solutions", tmp_path, monkeypatch, capsys)
+    run_folder, exit_code = _run_cli("multiple_optimal_solutions", integration_output_root, monkeypatch, capsys)
 
     # ASSERT
     assert exit_code == 0
@@ -114,12 +136,12 @@ def test__cli_main__given_multiple_optimal_solutions__returns_shared_optimal_cal
 
 @pytest.mark.integration
 def test__cli_main__given_large_instance__triggers_heuristic_and_returns_feasible_solution(
-    tmp_path, monkeypatch, capsys
+    integration_output_root, monkeypatch, capsys
 ):
     # ARRANGE / ACT — 55 feasible products exceeds orchestrator.MAX_PRODUCTS_FOR_MIP
     # (50), routing this request to the greedy heuristic instead of exact MIP.
     # The heuristic isn't guaranteed optimal, so only feasibility is checked.
-    run_folder, exit_code = _run_cli("large_instance_triggers_heuristic", tmp_path, monkeypatch, capsys)
+    run_folder, exit_code = _run_cli("large_instance_triggers_heuristic", integration_output_root, monkeypatch, capsys)
 
     # ASSERT
     assert exit_code == 0
@@ -133,12 +155,14 @@ def test__cli_main__given_large_instance__triggers_heuristic_and_returns_feasibl
 
 @pytest.mark.integration
 def test__cli_main__given_individually_infeasible_products__filters_them_and_solves_with_the_rest(
-    tmp_path, monkeypatch, capsys
+    integration_output_root, monkeypatch, capsys
 ):
     # ARRANGE / ACT — luxury_item (too expensive) and heavy_item (too heavy)
     # are filtered out by preprocessing on their own, before the solver ever
     # sees them; only affordable_snack remains to build the recommendation.
-    run_folder, exit_code = _run_cli("individually_infeasible_product_filtered", tmp_path, monkeypatch, capsys)
+    run_folder, exit_code = _run_cli(
+        "individually_infeasible_product_filtered", integration_output_root, monkeypatch, capsys
+    )
 
     # ASSERT
     assert exit_code == 0
@@ -148,11 +172,11 @@ def test__cli_main__given_individually_infeasible_products__filters_them_and_sol
 
 @pytest.mark.integration
 def test__cli_main__given_quantity_greater_than_one__selects_multiple_units_of_same_product(
-    tmp_path, monkeypatch, capsys
+    integration_output_root, monkeypatch, capsys
 ):
     # ARRANGE / ACT — a single cheap, light product means the optimum buys
     # 10 units of it, confirming the model isn't restricted to 0/1 per product.
-    run_folder, exit_code = _run_cli("quantity_greater_than_one", tmp_path, monkeypatch, capsys)
+    run_folder, exit_code = _run_cli("quantity_greater_than_one", integration_output_root, monkeypatch, capsys)
 
     # ASSERT
     assert exit_code == 0
@@ -163,11 +187,13 @@ def test__cli_main__given_quantity_greater_than_one__selects_multiple_units_of_s
 
 
 @pytest.mark.integration
-def test__cli_main__given_both_constraints_binding__saturates_budget_and_weight_together(tmp_path, monkeypatch, capsys):
+def test__cli_main__given_both_constraints_binding__saturates_budget_and_weight_together(
+    integration_output_root, monkeypatch, capsys
+):
     # ARRANGE / ACT — 4 x_item + 1 y_item exactly exhausts both the budget
     # and the weight limit at the same time, unlike the other feasible cases
     # where only one constraint binds.
-    run_folder, exit_code = _run_cli("both_constraints_binding", tmp_path, monkeypatch, capsys)
+    run_folder, exit_code = _run_cli("both_constraints_binding", integration_output_root, monkeypatch, capsys)
 
     # ASSERT
     assert exit_code == 0
