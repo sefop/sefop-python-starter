@@ -4,6 +4,7 @@ This is the main entry point that calling code (e.g., a CLI command) uses to
 run an optimization. It coordinates loading data, running the solver, and
 returning a response, so callers don't need to manage those steps themselves.
 """
+from __future__ import annotations
 
 import logging
 from datetime import datetime
