@@ -56,8 +56,7 @@ class PreProcess:
         feasible_products = [
             p
             for p in request.products
-            if p.price_usd <= request.max_budget_usd
-            and p.weight_kg <= request.max_weight_kg
+            if p.price_usd <= request.max_budget_usd and p.weight_kg <= request.max_weight_kg
             # "20 calories or less" is prohibited, so the boundary is exclusive:
             # a product must have strictly more than MIN_CALORIES_ALLOWED to survive.
             and p.calories > MIN_CALORIES_ALLOWED
