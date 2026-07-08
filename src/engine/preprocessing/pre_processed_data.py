@@ -17,9 +17,11 @@ class PreProcessedData:
     Attributes:
         request: The original knapsack request.
         feasible_products: Products where a single unit fits within both the
-            weight and budget constraints. Strategies should iterate this list
-            instead of request.products to avoid wasting effort on products
-            that can never be selected.
+            weight and budget constraints, and whose calories exceed the
+            minimum-calorie policy threshold (see MIN_CALORIES_ALLOWED in
+            engine.preprocessing.preprocessing). Strategies should iterate
+            this list instead of request.products to avoid wasting effort on
+            products that can never be selected.
     """
 
     request: Request

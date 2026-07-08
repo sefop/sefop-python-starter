@@ -35,8 +35,8 @@ def _select_strategy(data: PreProcessedData) -> OptimizationStrategy:
     """Choose MIP or greedy based on the number of feasible products.
 
     Using feasible_products (not request.products) reflects the actual problem
-    size after preprocessing: infeasible products were already removed and will
-    not appear in the model.
+    size after preprocessing: products that are infeasible or policy-prohibited
+    were already removed and will not appear in the model.
 
     Args:
         data: The preprocessed data to evaluate.
@@ -76,8 +76,10 @@ class Orchestrator:
         """
         data = self._preprocessing.run(request)
         if not data.feasible_products:
-            # Every product costs more than the budget or weighs more than the
-            # capacity, so no valid selection exists.
+            # Either every product costs more than the budget or weighs more
+            # than the capacity, or every product has 20 calories or less and
+            # was filtered out by the minimum-calorie policy — either way, no
+            # valid selection exists.
             logger.warning("No feasible products after preprocessing; skipping solve")
             return None
         optimization_strategy: OptimizationStrategy = _select_strategy(data)

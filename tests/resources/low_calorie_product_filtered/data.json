@@ -1,0 +1,9 @@
+{
+  "requestId": "low_calorie_product_filtered",
+  "maxWeightKg": 2.0,
+  "maxBudgetUsd": 5.0,
+  "products": [
+    { "name": "valid_snack", "priceUsd": 3.00, "weightKg": 1.0, "calories": 120 },
+    { "name": "negligible_snack", "priceUsd": 1.00, "weightKg": 0.2, "calories": 15 }
+  ]
+}

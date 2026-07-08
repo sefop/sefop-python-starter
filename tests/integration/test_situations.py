@@ -4,8 +4,8 @@ Each test drives the real CLI (cli.main()) against one pre-built "situation"
 folder under tests/resources/. Together the situations cover the range of
 behaviors the optimization pipeline needs to get right: a clean feasible optimum,
 total infeasibility, ties between optimal solutions, the MIP/heuristic strategy switch,
-preprocessing's filtering of individually-infeasible products, quantities above 1,
-and both constraints binding at once.
+preprocessing's filtering of individually-infeasible and policy-prohibited
+(low-calorie) products, quantities above 1, and both constraints binding at once.
 """
 
 import csv
@@ -168,6 +168,22 @@ def test__cli_main__given_individually_infeasible_products__filters_them_and_sol
     assert exit_code == 0
     assert _read_totals(run_folder)["calories"] == 120
     _assert_model_lp_matches_golden("individually_infeasible_product_filtered", run_folder)
+
+
+@pytest.mark.integration
+def test__cli_main__given_low_calorie_product__filters_it_and_solves_with_the_rest(
+    integration_output_root, monkeypatch, capsys
+):
+    # ARRANGE / ACT — negligible_snack (15 calories) is policy-prohibited by
+    # preprocessing's minimum-calorie rule, even though it fits both the
+    # weight and budget constraints; only valid_snack remains to build the
+    # recommendation.
+    run_folder, exit_code = _run_cli("low_calorie_product_filtered", integration_output_root, monkeypatch, capsys)
+
+    # ASSERT
+    assert exit_code == 0
+    assert _read_totals(run_folder)["calories"] == 120
+    _assert_model_lp_matches_golden("low_calorie_product_filtered", run_folder)
 
 
 @pytest.mark.integration

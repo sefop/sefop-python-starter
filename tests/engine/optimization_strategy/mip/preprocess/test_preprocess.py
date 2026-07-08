@@ -65,3 +65,40 @@ def test__preprocess__run__keeps_only_feasible_products_from_mixed_catalogue(ban
 
     # ASSERT — only banana survives the filter
     assert result.feasible_products == [banana]
+
+
+def test__preprocess__run__excludes_product_with_exactly_threshold_calories():
+    # ARRANGE — "20 or less" is prohibited, so a product with exactly 20
+    # calories must be excluded even though it fits weight and budget.
+    negligible = Product(name="ice_cube", price_usd=0.1, weight_kg=0.01, calories=20)
+    request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[negligible])
+
+    # ACT
+    result = PreProcess().run(request)
+
+    # ASSERT
+    assert result.feasible_products == []
+
+
+def test__preprocess__run__keeps_product_with_calories_just_above_threshold():
+    # ARRANGE — one calorie above the prohibited threshold must be kept.
+    just_enough = Product(name="mint", price_usd=0.1, weight_kg=0.01, calories=21)
+    request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[just_enough])
+
+    # ACT
+    result = PreProcess().run(request)
+
+    # ASSERT
+    assert result.feasible_products == [just_enough]
+
+
+def test__preprocess__run__excludes_low_calorie_product_from_mixed_catalogue(banana):
+    # ARRANGE — banana (89 cal) is kept; ice_cube (20 cal) is policy-prohibited.
+    negligible = Product(name="ice_cube", price_usd=0.1, weight_kg=0.01, calories=20)
+    request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana, negligible])
+
+    # ACT
+    result = PreProcess().run(request)
+
+    # ASSERT — only banana survives the filter
+    assert result.feasible_products == [banana]
