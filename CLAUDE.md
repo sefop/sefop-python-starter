@@ -6,8 +6,6 @@
 
 - Python starter reference implementation of the [SEFOP framework](https://github.com/fjzs/sefop) — a framework that brings software engineering techniques to 
   decision-support software.
-- Every design decision should be commented clearly in the file so data scientists can understand its purpose.
-- This project should use minimal dependencies so this repository can be used by scientists easily.
 - Use simply language and comment the code relentlessly according to .claude/skills/comment-code/SKILL.md so any data scientist without knowledge in software engineering 
   can understand this repository.
 - The project should be designed in such a way that it is easy to fork and reuse.
