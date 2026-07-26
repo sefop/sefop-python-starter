@@ -14,6 +14,7 @@ Run with:
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 from dataclasses import replace
 from datetime import datetime
@@ -153,6 +154,7 @@ def _evaluate(args: argparse.Namespace, settings: Settings) -> int:
 
 
 def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     parser = _build_parser()
     args = parser.parse_args()
     settings = Settings()
