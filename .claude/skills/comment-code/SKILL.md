@@ -75,3 +75,5 @@ SEFOP template code must be readable by a data scientist who knows optimization 
   ```
 
 - **Don't over-explain**: no comments on well-named code, no Python-syntax explanations, no re-deriving the architecture in every file. Test: would a reader who just finished a Python tutorial need this? If only someone who's never seen a for-loop would, skip it.
+
+- **Don't over-explain**: no comments on well-named code, no Python-syntax explanations, no re-deriving the architecture in every file. Test: would a reader who just finished a Python tutorial need this? If only someone who's never seen a for-loop would, skip it.
