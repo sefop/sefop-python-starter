@@ -67,7 +67,7 @@ The solver picks 4 apples — chocolate costs 10× more per calorie, so it never
 ## Repository structure
 
 This project follows a simplified **[Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)**: three layers
-(`domain/`, `use_cases/`, `adapters/`), full manual dependency injection, and
+(`domain/`, `use_cases/`, `adapters/`), full manual [Dependency Injection](https://www.geeksforgeeks.org/system-design/dependency-injectiondi-design-pattern/), and
 a single composition root (`startup.py`) that wires everything together.
 
 ```
