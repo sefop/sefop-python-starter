@@ -42,9 +42,7 @@ def request_(banana, chips) -> Request:
 
 def test__evaluate__given_unknown_request_id__returns_failure(request_):
     # ARRANGE
-    use_case = EvaluateSolutionForRequest(
-        request_loader=_FakeDataLoader(None), solution_loader=_FakeSolutionLoader({})
-    )
+    use_case = EvaluateSolutionForRequest(request_loader=_FakeDataLoader(None), solution_loader=_FakeSolutionLoader({}))
 
     # ACT
     response = use_case.evaluate("missing", Path("solution.json"))

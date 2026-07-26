@@ -54,9 +54,7 @@ def test__solve_all__solves_every_discovered_id_and_returns_responses_in_order(b
         "1": Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana]),
         "2": Request(max_weight_kg=5.0, max_budget_usd=0.01, products=[banana]),  # infeasible
     }
-    solve_single_request = SolveSingleRequest(
-        request_loader=_FakeDataLoader(requests), orchestrator=_orchestrator()
-    )
+    solve_single_request = SolveSingleRequest(request_loader=_FakeDataLoader(requests), orchestrator=_orchestrator())
     use_case = SolveMultipleRequests(
         request_discovery=_FakeDiscovery(["1", "2"]), solve_single_request=solve_single_request
     )
@@ -82,9 +80,7 @@ def test__solve_all__given_no_discovered_ids__returns_empty_list(banana):
 def test__solve_all__shares_one_timestamp_across_the_batch(banana):
     # ARRANGE
     requests = {"1": Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])}
-    solve_single_request = SolveSingleRequest(
-        request_loader=_FakeDataLoader(requests), orchestrator=_orchestrator()
-    )
+    solve_single_request = SolveSingleRequest(request_loader=_FakeDataLoader(requests), orchestrator=_orchestrator())
     use_case = SolveMultipleRequests(request_discovery=_FakeDiscovery(["1"]), solve_single_request=solve_single_request)
     fixed_timestamp = datetime(2026, 1, 1, 12, 0, 0)
 

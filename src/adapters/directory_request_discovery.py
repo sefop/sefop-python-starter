@@ -35,9 +35,5 @@ class DirectoryRequestDiscovery(BaseRequestDiscovery):
         """
         if not self._folder_path.exists():
             return []
-        ids = [
-            child.name
-            for child in self._folder_path.iterdir()
-            if child.is_dir() and (child / "data.json").exists()
-        ]
+        ids = [child.name for child in self._folder_path.iterdir() if child.is_dir() and (child / "data.json").exists()]
         return sorted(ids)
