@@ -1,5 +1,5 @@
 """
-ROLE: Abstract interface for persisting an optimization result to disk.
+ROLE: Abstract Base Class — contract for persisting an optimization result to disk.
 
 WHY THIS EXISTS:
     The CLI needs to save every run's input and solution somewhere, but the

@@ -1,5 +1,5 @@
 """
-ROLE: Implementation of BaseSolutionLoader that reads a candidate solution from JSON.
+ROLE: Implementation — of BaseSolutionLoader, reading a candidate solution from JSON.
 
 WHY THIS EXISTS:
     This module is the only place in the codebase that knows the on-disk
@@ -24,21 +24,22 @@ class JsonSolutionLoader(BaseSolutionLoader):
     instances on a specific Request is the caller's job, not this loader's.
     """
 
-    def load(self, path: Path) -> dict[str, int]:
+    def load(self, path: Path) -> dict[str, int] | None:
         """Load candidate product quantities from a JSON file.
 
         Args:
             path: Path to the JSON file describing the candidate solution.
 
         Returns:
-            Mapping from product name to candidate quantity.
+            Mapping from product name to candidate quantity, or None if the
+            file does not exist.
 
         Raises:
-            ValueError: If the file does not exist, is not valid JSON, is not
-                a flat object, or contains a non-positive quantity.
+            ValueError: If the file exists but is not valid JSON, is not a
+                flat object, or contains a non-positive quantity.
         """
         if not path.exists():
-            raise ValueError(f"Solution file not found: {path}")
+            return None  # "not found" — matches BaseDataLoader's contract
 
         raw = path.read_text(encoding="utf-8")
         try:

@@ -1,5 +1,5 @@
 """
-ROLE: Implementation of BaseRequestDiscovery that scans a folder for request subfolders.
+ROLE: Implementation — of BaseRequestDiscovery, scanning a folder for request subfolders.
 
 WHY THIS EXISTS:
     This module is the only place (besides JsonDataLoader) that knows request

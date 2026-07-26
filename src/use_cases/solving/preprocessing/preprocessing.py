@@ -1,13 +1,13 @@
-"""Preprocessing stage that prepares request data for optimization strategies.
+"""Preprocessing stage that prepares request data for a SolutionProvider.
 
 Domain validation (Request.__post_init__) already guarantees that each product
 has positive weight, price, and calories and that names are unique. Preprocessing
 goes one step further: it removes products that can never appear in any solution.
 
 A product is *individually infeasible* if a single unit of it already exceeds
-either the weight capacity or the budget. No strategy — exact or heuristic —
-could ever select such a product, so filtering them out here shrinks the problem
-before any solver sees it.
+either the weight capacity or the budget. No SolutionProvider — exact or
+heuristic — could ever select such a product, so filtering them out here
+shrinks the problem before any solver sees it.
 """
 
 from __future__ import annotations
@@ -17,14 +17,14 @@ from use_cases.solving.preprocessing.pre_processed_data import PreProcessedData
 
 
 class PreProcess:
-    """Preprocessing step before strategy execution.
+    """Preprocessing step before a SolutionProvider runs.
 
     Filters out products that are individually infeasible, then wraps the
-    remaining data in PreProcessedData for the strategy stage.
+    remaining data in PreProcessedData for the SolutionProvider stage.
     """
 
     def run(self, request: Request) -> PreProcessedData:
-        """Filter infeasible products and prepare data for the strategy stage.
+        """Filter infeasible products and prepare data for the SolutionProvider stage.
 
         A product is infeasible when a single unit costs more than the total
         budget or weighs more than the total weight capacity — it can never

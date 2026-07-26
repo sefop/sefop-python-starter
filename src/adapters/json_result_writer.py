@@ -1,5 +1,5 @@
 """
-ROLE: Implementation of BaseResultWriter that saves each run as JSON files.
+ROLE: Implementation — of BaseResultWriter, saving each run as JSON files.
 
 WHY THIS EXISTS:
     Mirrors CsvResultWriter's responsibilities (copy input, write status,

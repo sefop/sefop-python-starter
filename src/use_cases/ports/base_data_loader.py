@@ -1,8 +1,13 @@
-"""Contract that every data-loading strategy must follow.
+"""
+ROLE: Abstract Base Class — contract that every data-loading strategy must follow.
 
-The optimization use cases load input data through this interface, so the
-source of data (Excel file, database, REST API, etc.) can change without
-modifying the optimization logic itself.
+WHY THIS EXISTS:
+    The optimization use cases load input data through this interface, so the
+    source of data (Excel file, database, REST API, etc.) can change without
+    modifying the optimization logic itself.
+
+WHERE IMPLEMENTATIONS LIVE:
+    Concrete loaders live in src/adapters/, e.g. json_data_loader.py.
 """
 
 from __future__ import annotations

@@ -28,8 +28,10 @@ from use_cases.ports.base_request_discovery import BaseRequestDiscovery
 from use_cases.ports.base_result_writer import BaseResultWriter
 from use_cases.solving.optimization.enumeration.enumeration_solution_provider import EnumerationSolutionProvider
 from use_cases.solving.optimization.heuristic.heuristic_solution_provider import HeuristicSolutionProvider
-from use_cases.solving.optimization.mip_google.mip_google_scip import MipGoogleScip
-from use_cases.solving.optimization.mip_highs.mip_highs import MipHighs
+from use_cases.solving.optimization.mip_google.mip_google_scip_solution_provider import (
+    MipGoogleScipSolutionProvider,
+)
+from use_cases.solving.optimization.mip_highs.mip_highs_solution_provider import MipHighsSolutionProvider
 from use_cases.solving.optimization.solution_provider import SolutionProvider
 from use_cases.solving.orchestrator import Orchestrator
 from use_cases.solving.postprocessing.postprocessing import PostProcess
@@ -46,7 +48,7 @@ class Settings:
     Attributes:
         folder_path: Root directory where request subfolders live
             (data/1/data.json, data/2/data.json, …).
-        solver_name: Solver technology passed to the MIP strategy.
+        solver_name: Solver technology passed to the MIP SolutionProvider.
         output_folder_path: Root directory each run's input and solution
             files are written under (output/1/<timestamp>/, …).
     """
@@ -60,9 +62,9 @@ def build_mip_solution_provider(settings: Settings) -> SolutionProvider:
     """Resolve settings.solver_name to a concrete MIP SolutionProvider.
 
     This is the one place in the codebase where a solver name string is
-    mapped to a class. Adding another MIP technology (as MipGoogleScip was
-    added alongside MipHighs) means adding one more branch here and a new
-    SolutionProvider implementation — nothing else in the codebase needs to
+    mapped to a class. Adding another MIP technology (as MipGoogleScipSolutionProvider
+    was added alongside MipHighsSolutionProvider) means adding one more branch here and
+    a new SolutionProvider implementation — nothing else in the codebase needs to
     change.
 
     Args:
@@ -75,9 +77,9 @@ def build_mip_solution_provider(settings: Settings) -> SolutionProvider:
         ValueError: If settings.solver_name does not match a known solver.
     """
     if settings.solver_name == "highs":
-        return MipHighs()
+        return MipHighsSolutionProvider()
     if settings.solver_name == "google_scip":
-        return MipGoogleScip()
+        return MipGoogleScipSolutionProvider()
     raise ValueError(f"Unknown solver '{settings.solver_name}'. Available: ['highs', 'google_scip']")
 
 

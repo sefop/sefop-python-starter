@@ -1,4 +1,5 @@
 import pytest
+
 from domain.product import Product
 from domain.request import Request
 from use_cases.solving.optimization.heuristic.heuristic_solution_provider import HeuristicSolutionProvider

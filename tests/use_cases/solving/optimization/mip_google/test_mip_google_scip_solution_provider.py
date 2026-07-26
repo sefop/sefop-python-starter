@@ -2,7 +2,7 @@ import pytest
 
 from domain.product import Product
 from domain.request import Request
-from use_cases.solving.optimization.mip_google.mip_google_scip import MipGoogleScip
+from use_cases.solving.optimization.mip_google.mip_google_scip_solution_provider import MipGoogleScipSolutionProvider
 from use_cases.solving.preprocessing.pre_processed_data import PreProcessedData
 
 
@@ -24,7 +24,7 @@ def preprocessed_data(banana, chips) -> PreProcessedData:
 
 def test__solve__recommendation_maps_solved_quantities_back_to_the_right_products(preprocessed_data, banana, chips):
     # ACT
-    recommendation = MipGoogleScip().solve(preprocessed_data)
+    recommendation = MipGoogleScipSolutionProvider().solve(preprocessed_data)
 
     # ASSERT — the solver only ever sees "quantity_<name>" variable names;
     # this proves the reverse lookup in _extract_recommendation correctly
@@ -42,7 +42,7 @@ def test__solve__when_no_product_fits__returns_none():
     data = PreProcessedData(request=request, feasible_products=list(request.products))
 
     # ACT
-    recommendation = MipGoogleScip().solve(data)
+    recommendation = MipGoogleScipSolutionProvider().solve(data)
 
     # ASSERT
     assert recommendation is None
@@ -50,7 +50,7 @@ def test__solve__when_no_product_fits__returns_none():
 
 def test__solve__prints_scip_optimization_log_to_console(preprocessed_data, capfd):
     # ACT
-    MipGoogleScip().solve(preprocessed_data)
+    MipGoogleScipSolutionProvider().solve(preprocessed_data)
 
     # ASSERT — SCIP writes its progress log straight to the process's stdout
     # file descriptor (not through sys.stdout), so capfd (fd-level capture)
@@ -61,7 +61,7 @@ def test__solve__prints_scip_optimization_log_to_console(preprocessed_data, capf
 
 def test__solve__given_output_dir__writes_model_pbtxt_file(preprocessed_data, tmp_path):
     # ACT
-    MipGoogleScip().solve(preprocessed_data, output_dir=tmp_path)
+    MipGoogleScipSolutionProvider().solve(preprocessed_data, output_dir=tmp_path)
 
     # ASSERT
     assert (tmp_path / "model.pbtxt").exists()
@@ -73,7 +73,7 @@ def test__solve__given_no_output_dir__writes_no_pbtxt_file(preprocessed_data, tm
     monkeypatch.chdir(tmp_path)
 
     # ACT
-    MipGoogleScip().solve(preprocessed_data)
+    MipGoogleScipSolutionProvider().solve(preprocessed_data)
 
     # ASSERT
     assert list(tmp_path.rglob("*.pbtxt")) == []

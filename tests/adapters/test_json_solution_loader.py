@@ -3,13 +3,15 @@ import pytest
 from adapters.json_solution_loader import JsonSolutionLoader
 
 
-def test__load__given_missing_file__raises_value_error(tmp_path):
+def test__load__given_missing_file__returns_none(tmp_path):
     # ARRANGE
     loader = JsonSolutionLoader()
 
-    # ACT / ASSERT
-    with pytest.raises(ValueError, match="not found"):
-        loader.load(tmp_path / "missing.json")
+    # ACT
+    result = loader.load(tmp_path / "missing.json")
+
+    # ASSERT
+    assert result is None
 
 
 def test__load__given_malformed_json__raises_value_error(tmp_path):

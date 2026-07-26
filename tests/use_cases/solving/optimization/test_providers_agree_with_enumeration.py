@@ -1,6 +1,6 @@
-"""Cross-checks that MipHighs, MipGoogleScip, and HeuristicSolutionProvider
-agree with the brute-force EnumerationSolutionProvider oracle on small,
-hand-verifiable instances.
+"""Cross-checks that MipHighsSolutionProvider, MipGoogleScipSolutionProvider, and
+HeuristicSolutionProvider agree with the brute-force EnumerationSolutionProvider
+oracle on small, hand-verifiable instances.
 
 This is the replacement for the deleted component-level structural tests
 (test_variable_select_product.py, test_constraint_limit_budget.py, etc.):
@@ -15,8 +15,10 @@ from domain.product import Product
 from domain.request import Request
 from use_cases.solving.optimization.enumeration.enumeration_solution_provider import EnumerationSolutionProvider
 from use_cases.solving.optimization.heuristic.heuristic_solution_provider import HeuristicSolutionProvider
-from use_cases.solving.optimization.mip_google.mip_google_scip import MipGoogleScip
-from use_cases.solving.optimization.mip_highs.mip_highs import MipHighs
+from use_cases.solving.optimization.mip_google.mip_google_scip_solution_provider import (
+    MipGoogleScipSolutionProvider,
+)
+from use_cases.solving.optimization.mip_highs.mip_highs_solution_provider import MipHighsSolutionProvider
 from use_cases.solving.preprocessing.pre_processed_data import PreProcessedData
 
 
@@ -55,7 +57,7 @@ def test__mip_highs__matches_enumeration_oracle_on_small_instances(banana, chips
     data = PreProcessedData(request=request, feasible_products=[banana, chips, soda])
 
     # ACT
-    mip_result = MipHighs().solve(data)
+    mip_result = MipHighsSolutionProvider().solve(data)
 
     # ASSERT — MIP is exact, so it must match the brute-force optimum exactly.
     assert mip_result is not None
@@ -78,7 +80,7 @@ def test__mip_google_scip__matches_enumeration_oracle_on_small_instances(
     data = PreProcessedData(request=request, feasible_products=[banana, chips, soda])
 
     # ACT
-    mip_result = MipGoogleScip().solve(data)
+    mip_result = MipGoogleScipSolutionProvider().solve(data)
 
     # ASSERT — MIP is exact, so it must match the brute-force optimum exactly.
     assert mip_result is not None

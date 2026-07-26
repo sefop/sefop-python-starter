@@ -1,9 +1,11 @@
-"""Defines the Request value object: one knapsack problem instance to solve.
+"""
+ROLE: Value Object — one knapsack problem instance to solve.
 
-A Request bundles everything the optimization engine needs to run - the budget, the weight
-limit, and the pool of candidate products - into a single, validated unit. Downstream code
-(services, engine, solvers) can accept a Request without re-checking its contents, because an
-invalid Request can never be constructed in the first place.
+WHY THIS EXISTS:
+    A Request bundles everything a SolutionProvider needs to run - the budget, the weight
+    limit, and the pool of candidate products - into a single, validated unit. Downstream code
+    (use_cases, solving providers) can accept a Request without re-checking its contents,
+    because an invalid Request can never be constructed in the first place.
 """
 
 from __future__ import annotations

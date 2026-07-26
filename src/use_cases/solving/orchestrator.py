@@ -1,18 +1,19 @@
-"""Orchestrates the knapsack optimization pipeline.
+"""
+ROLE: Orchestrator — sequences the knapsack optimization pipeline end-to-end.
 
-The Orchestrator is the public face of the solve use cases' internal solving
-pipeline (see the package docstring convention: this whole `solving/`
-subpackage is an implementation detail of `SolveSingleRequest`, not a
-top-level architecture layer). Given a Request, it runs three explicit
-stages: preprocessing -> provider selection and solving -> postprocessing.
-Returns a Recommendation or None. Callers never need to know which provider
-was chosen or how preprocessing/postprocessing work.
+WHY THIS EXISTS:
+    The Orchestrator is the public face of the solve use cases' internal solving
+    pipeline (this whole `solving/` subpackage is an implementation detail of
+    `SolveSingleRequest`, not a top-level architecture layer). Given a Request, it
+    runs three explicit stages: preprocessing -> provider selection and solving ->
+    postprocessing. Returns a Recommendation or None. Callers never need to know
+    which provider was chosen or how preprocessing/postprocessing work.
 
-Key design: provider selection is based on problem size. A small enough
-combinatorial search space (at most max_combinations_for_enumeration) is
-solved exactly by brute force; otherwise, small enough problems (at most
-max_products_for_mip products) use the exact MIP solver; anything larger
-uses the fast greedy heuristic. This selection is hidden from callers.
+    Key design: provider selection is based on problem size. A small enough
+    combinatorial search space (at most max_combinations_for_enumeration) is
+    solved exactly by brute force; otherwise, small enough problems (at most
+    max_products_for_mip products) use the exact MIP solver; anything larger
+    uses the fast greedy heuristic. This selection is hidden from callers.
 """
 
 from __future__ import annotations

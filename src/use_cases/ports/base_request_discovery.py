@@ -1,5 +1,5 @@
 """
-ROLE: Abstract interface for discovering which request IDs exist in a batch.
+ROLE: Abstract Base Class — contract for discovering which request IDs exist in a batch.
 
 WHY THIS EXISTS:
     SolveMultipleRequests needs to know which request IDs to solve before it

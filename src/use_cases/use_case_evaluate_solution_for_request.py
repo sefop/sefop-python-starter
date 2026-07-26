@@ -51,6 +51,9 @@ class EvaluateSolutionForRequest:
             return EvaluationResponse.failure(f"Request '{request_id}' not found")
 
         raw_quantities = self._solution_loader.load(solution_path)
+        if raw_quantities is None:
+            logger.warning("Solution file not found: %s", solution_path)
+            return EvaluationResponse.failure(f"Solution file '{solution_path}' not found")
 
         # Checked explicitly, with its own message, rather than left for
         # Recommendation to reject: Recommendation's "not in request" error is

@@ -1,11 +1,13 @@
-"""Exact MIP solver for the knapsack problem, using Google OR-Tools MathOpt with SCIP.
+"""
+ROLE: Implementation — of SolutionProvider, for the MathOpt technology configured to run
+the GSCIP (SCIP) solver backend.
 
-ROLE: Implementation of SolutionProvider for the MathOpt technology, configured to run the
-GSCIP (SCIP) solver backend. Mirrors MipHighs's contract and internal shape (variables ->
-objective -> constraints -> extract) but drives MathOpt's expression-based model-building API
-(build a linear expression with normal Python operators) instead of HiGHS's index/matrix-based
-one, since the two libraries don't share a common enough shape to abstract over for a template
-this size.
+WHY THIS EXISTS:
+    Mirrors MipHighsSolutionProvider's contract and internal shape (variables ->
+    objective -> constraints -> extract) but drives MathOpt's expression-based model-building
+    API (build a linear expression with normal Python operators) instead of HiGHS's
+    index/matrix-based one, since the two libraries don't share a common enough shape to
+    abstract over for a template this size.
 """
 
 from __future__ import annotations
@@ -25,7 +27,7 @@ from use_cases.solving.preprocessing.pre_processed_data import PreProcessedData
 logger = logging.getLogger(__name__)
 
 
-class MipGoogleScip(SolutionProvider):
+class MipGoogleScipSolutionProvider(SolutionProvider):
     """Builds the knapsack MIP model against Google OR-Tools MathOpt and solves it with SCIP.
 
         maximize   sum(i) calories_i * x_i

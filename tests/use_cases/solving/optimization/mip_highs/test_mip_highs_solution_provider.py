@@ -2,7 +2,7 @@ import pytest
 
 from domain.product import Product
 from domain.request import Request
-from use_cases.solving.optimization.mip_highs.mip_highs import MipHighs
+from use_cases.solving.optimization.mip_highs.mip_highs_solution_provider import MipHighsSolutionProvider
 from use_cases.solving.preprocessing.pre_processed_data import PreProcessedData
 
 
@@ -24,7 +24,7 @@ def preprocessed_data(banana, chips) -> PreProcessedData:
 
 def test__solve__recommendation_maps_solved_quantities_back_to_the_right_products(preprocessed_data, banana, chips):
     # ACT
-    recommendation = MipHighs().solve(preprocessed_data)
+    recommendation = MipHighsSolutionProvider().solve(preprocessed_data)
 
     # ASSERT — the solver only ever sees "quantity_<name>" variable names;
     # this proves the reverse lookup in _extract_recommendation correctly
@@ -37,7 +37,7 @@ def test__solve__recommendation_maps_solved_quantities_back_to_the_right_product
 
 def test__solve__given_output_dir__writes_model_lp_file(preprocessed_data, tmp_path):
     # ACT
-    MipHighs().solve(preprocessed_data, output_dir=tmp_path)
+    MipHighsSolutionProvider().solve(preprocessed_data, output_dir=tmp_path)
 
     # ASSERT — content (variable naming, formatting) is HiGHS-internal detail,
     # not asserted here; only the output_dir contract itself is checked.
@@ -50,7 +50,7 @@ def test__solve__given_no_output_dir__writes_no_lp_file(preprocessed_data, tmp_p
     monkeypatch.chdir(tmp_path)
 
     # ACT
-    MipHighs().solve(preprocessed_data)
+    MipHighsSolutionProvider().solve(preprocessed_data)
 
     # ASSERT
     assert list(tmp_path.rglob("*.lp")) == []

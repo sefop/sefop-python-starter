@@ -1,5 +1,5 @@
 """
-ROLE: Abstract interface for loading a candidate solution to evaluate.
+ROLE: Abstract Base Class — contract for loading a candidate solution to evaluate.
 
 WHY THIS EXISTS:
     EvaluateSolutionForRequest needs to read a user-supplied candidate
@@ -32,16 +32,17 @@ class BaseSolutionLoader(ABC):
     """
 
     @abstractmethod
-    def load(self, path: Path) -> dict[str, int]:
+    def load(self, path: Path) -> dict[str, int] | None:
         """Load candidate product quantities from a file.
 
         Args:
             path: Path to the file describing the candidate solution.
 
         Returns:
-            Mapping from product name to the candidate quantity selected.
+            Mapping from product name to the candidate quantity selected, or
+            None if the file does not exist.
 
         Raises:
-            ValueError: If the file is missing, malformed, or contains a
+            ValueError: If the file exists but is malformed or contains a
                 non-positive quantity.
         """

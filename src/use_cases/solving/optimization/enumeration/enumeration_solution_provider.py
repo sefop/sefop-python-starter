@@ -1,11 +1,15 @@
-"""Brute-force, exact solver used for small search spaces and as a test oracle.
+"""
+ROLE: Implementation — of SolutionProvider, using exhaustive search rather than
+any solver library. Brute-force, exact solver used for small search spaces and
+as a test oracle.
 
-ROLE: Implementation of SolutionProvider using exhaustive search rather than
-any solver library. Every combination of per-product quantities is tried;
-the feasible combination with the highest total_calories wins. This is
-simple enough to trust by inspection, which is exactly why it also serves as
-the ground truth other providers (MipHighs, HeuristicSolutionProvider) are
-checked against in tests, instead of asserting on their internal formulation.
+WHY THIS EXISTS:
+    Every combination of per-product quantities is tried; the feasible combination
+    with the highest total_calories wins. This is simple enough to trust by
+    inspection, which is exactly why it also serves as the ground truth other
+    providers (MipHighsSolutionProvider, MipGoogleScipSolutionProvider,
+    HeuristicSolutionProvider) are checked against in tests, instead of asserting
+    on their internal formulation.
 """
 
 from __future__ import annotations

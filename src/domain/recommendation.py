@@ -1,10 +1,12 @@
-"""Defines the Recommendation value object: a validated solution to a Request.
+"""
+ROLE: Value Object — a validated solution to a Request.
 
-A Recommendation pairs a chosen quantity per product with the Request it answers, and derives
-the resulting totals itself. Deriving the totals here - rather than trusting a caller to
-compute and pass them in - means a Recommendation can never report totals that disagree with
-its own quantities, and can never exist in a state that violates the originating Request's
-budget or weight limits.
+WHY THIS EXISTS:
+    A Recommendation pairs a chosen quantity per product with the Request it answers, and
+    derives the resulting totals itself. Deriving the totals here - rather than trusting a
+    caller to compute and pass them in - means a Recommendation can never report totals that
+    disagree with its own quantities, and can never exist in a state that violates the
+    originating Request's budget or weight limits.
 """
 
 from __future__ import annotations

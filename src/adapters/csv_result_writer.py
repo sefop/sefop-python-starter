@@ -1,5 +1,5 @@
 """
-ROLE: Implementation of BaseResultWriter that saves each run as plain files.
+ROLE: Implementation — of BaseResultWriter, saving each run as plain CSV/text files.
 
 WHY THIS EXISTS:
     This module is the only place in the codebase that knows about CSV files

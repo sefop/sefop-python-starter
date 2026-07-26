@@ -1,6 +1,7 @@
 import math
 
 import pytest
+
 from domain.product import Product
 from domain.request import Request
 

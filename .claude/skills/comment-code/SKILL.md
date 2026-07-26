@@ -57,23 +57,21 @@ SEFOP template code must be readable by a data scientist who knows optimization 
   | Role | Directory | Purpose |
   |------|-----------|---------|
   | `Entity` | `src/domain/` | Pure data model, no dependencies, no solver imports. |
-  | `Value Object` | `src/domain/` | Immutable, self-validating descriptor of a quantity/concept. |
-  | `Abstract Base Class` | `src/services/` | Abstract interface that services depend on. |
-  | `Orchestrator` | `src/services/` | Sequences one user-facing operation end-to-end, no business logic of its own. |
-  | `Strategy` | `src/services/` or `src/optimization/` | Pluggable algorithm producing a result from a request. |
-  | `Implementation` | `src/optimization/` | Concrete solver implementation for a specific technology. |
+  | `Value Object` | `src/domain/`, `src/use_cases/` (response DTOs) | Immutable, self-validating descriptor of a quantity/concept, or of a use case's outcome. |
+  | `Abstract Base Class` | `src/use_cases/ports/`, `src/use_cases/solving/optimization/solution_provider.py` | Abstract interface that use cases or the solving pipeline depend on. |
+  | `Orchestrator` | `src/use_cases/solving/orchestrator.py` | Sequences one user-facing operation end-to-end, no business logic of its own. |
+  | `Implementation` | `src/adapters/`, `src/use_cases/solving/optimization/<technology>/` | Concrete implementation of a port or a `SolutionProvider`, for one specific technology. |
 
-- **Class docstrings** for ABC / Strategy / Dependency Injection / frozen dataclass: one short paragraph naming and explaining the pattern (e.g., "this is a contract pattern — like a power socket shape"), then one paragraph on what *this* class does with it. State each pattern once per file; don't re-explain it in every method.
+- **Class docstrings** for ABC / Dependency Injection / frozen dataclass: one short paragraph naming and explaining the pattern (e.g., "this is a contract pattern — like a power socket shape"), then one paragraph on what *this* class does with it. State each pattern once per file; don't re-explain it in every method.
 - **Inline comments** explain the engineering choice's consequence (e.g., *why* a solver is injected rather than constructed: "so tests can pass a mock without a real HiGHS install — this is Dependency Injection").
-- **Math in the optimization layer**: state the formula in a comment next to the Pyomo expression so a reader can map math ↔ code.
+- **Math in the optimization layer**: state the formula in a comment next to the model-building expression so a reader can map math ↔ code.
 
   ```python
-  # Constraint: ∑ w_i · x_i ≤ W — cargo weight must not exceed capacity W.
-  model.weight_limit = Constraint(
-      expr=sum(data.weight[i] * model.x[i] for i in model.I) <= data.capacity_weight
+  # Constraint: ∑ price_i · x_i ≤ budget — total cost must not exceed max_budget_usd.
+  model.add_linear_constraint(
+      sum(product.price_usd * variables[name] for product, name in ...) <= request.max_budget_usd,
+      name="budget_limit",
   )
   ```
-
-- **Don't over-explain**: no comments on well-named code, no Python-syntax explanations, no re-deriving the architecture in every file. Test: would a reader who just finished a Python tutorial need this? If only someone who's never seen a for-loop would, skip it.
 
 - **Don't over-explain**: no comments on well-named code, no Python-syntax explanations, no re-deriving the architecture in every file. Test: would a reader who just finished a Python tutorial need this? If only someone who's never seen a for-loop would, skip it.

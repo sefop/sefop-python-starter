@@ -1,13 +1,13 @@
-"""Exact MIP solver for the knapsack problem, using HiGHS directly.
+"""
+ROLE: Implementation — of SolutionProvider, for the HiGHS solver technology.
 
-ROLE: Implementation of SolutionProvider for the HiGHS solver technology.
-This is the only file in the project that imports highspy — everything
-about building the model (variables, objective, constraints) and reading
-the solution back out lives here, with no shared abstraction between this
-and any other solver technology that might be added later (e.g.
-MipGoogleOrTools): each technology owns its own complete formulation, since
-the two solvers' APIs don't share a common shape worth abstracting over for
-a template this size.
+WHY THIS EXISTS:
+    This is the only file in the project that imports highspy — everything
+    about building the model (variables, objective, constraints) and reading
+    the solution back out lives here, with no shared abstraction between this
+    and MipGoogleScipSolutionProvider: each technology owns its own complete
+    formulation, since the two solvers' APIs don't share a common shape worth
+    abstracting over for a template this size.
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ _FEASIBLE_STATUSES = {
 }
 
 
-class MipHighs(SolutionProvider):
+class MipHighsSolutionProvider(SolutionProvider):
     """Builds the knapsack MIP model directly against highspy and solves it.
 
         maximize   sum(i) calories_i * x_i

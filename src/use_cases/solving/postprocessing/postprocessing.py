@@ -1,19 +1,23 @@
-"""Post-processing stage that refines optimizer results.
+"""
+ROLE: Implementation of a post-processing step for the solving pipeline.
 
-This module sits at the end of the optimization pipeline. The default
-implementation is intentionally a pass-through — override it to add
-solution validation, result enrichment, or reporting without touching
-the optimizer itself.
+WHY THIS EXISTS:
+    This module sits at the end of the optimization pipeline. The default
+    implementation sorts the recommendation's products by quantity so
+    output is deterministic and readable — override it to add further
+    steps, such as solution validation, result enrichment, or reporting,
+    without touching the provider that produced the recommendation.
 """
 
 from domain.recommendation import Recommendation
 
 
 class PostProcess:
-    """Post-processing step after strategy execution.
+    """Post-processing step after provider execution.
 
-    Override this class to add custom post-processing logic such as
-    solution validation, result enrichment, or reporting.
+    The default `run()` sorts the recommendation's products from highest
+    to lowest quantity. Override this class to add custom post-processing
+    logic such as solution validation, result enrichment, or reporting.
     """
 
     def run(self, recommendation: Recommendation) -> Recommendation:

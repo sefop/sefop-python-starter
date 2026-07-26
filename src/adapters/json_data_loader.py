@@ -1,14 +1,17 @@
-"""Loads Request data from a JSON file on disk.
+"""
+ROLE: Implementation of BaseDataLoader that reads Request data from JSON.
 
-This module is the only place in the codebase that knows about JSON files.
-The rest of the system talks to the abstract ``BaseDataLoader`` base class;
-this is one concrete implementation of it.
+WHY THIS EXISTS:
+    This module is the only place in the codebase that knows about JSON files.
+    The rest of the system talks to the abstract ``BaseDataLoader`` base class;
+    this is one concrete implementation of it.
 """
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from domain.product import Product
 from domain.request import Request
@@ -56,7 +59,7 @@ class JsonDataLoader(BaseDataLoader):
         return _parse_request(data, request_id)
 
 
-def _parse_request(data: dict, request_id: str) -> Request:
+def _parse_request(data: dict[str, Any], request_id: str) -> Request:
     """Map a camelCase JSON dict to a ``Request`` domain object.
 
     Raises ValueError on any missing or invalid field so the caller gets a
@@ -73,7 +76,7 @@ def _parse_request(data: dict, request_id: str) -> Request:
         raise ValueError(f"data.json for request '{request_id}' is missing required field: {exc}") from exc
 
 
-def _parse_product(data: dict) -> Product:
+def _parse_product(data: dict[str, Any]) -> Product:
     """Map a camelCase JSON dict to a ``Product`` domain object."""
     try:
         return Product(

@@ -19,10 +19,10 @@ class _FakeDataLoader(BaseDataLoader):
 
 
 class _FakeSolutionLoader(BaseSolutionLoader):
-    def __init__(self, quantities: dict[str, int]) -> None:
+    def __init__(self, quantities: dict[str, int] | None) -> None:
         self._quantities = quantities
 
-    def load(self, path: Path) -> dict[str, int]:
+    def load(self, path: Path) -> dict[str, int] | None:
         return self._quantities
 
 
@@ -51,6 +51,20 @@ def test__evaluate__given_unknown_request_id__returns_failure(request_):
     # ASSERT
     assert response.feasible is False
     assert "missing" in (response.message or "")
+
+
+def test__evaluate__given_missing_solution_file__returns_failure(request_):
+    # ARRANGE — solution_loader returns None to signal "file not found"
+    use_case = EvaluateSolutionForRequest(
+        request_loader=_FakeDataLoader(request_), solution_loader=_FakeSolutionLoader(None)
+    )
+
+    # ACT
+    response = use_case.evaluate("1", Path("missing.json"))
+
+    # ASSERT
+    assert response.feasible is False
+    assert "missing.json" in (response.message or "")
 
 
 def test__evaluate__given_unknown_product_name__returns_failure(request_):

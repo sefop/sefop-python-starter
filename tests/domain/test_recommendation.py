@@ -1,9 +1,10 @@
 import math
 
 import pytest
+
 from domain.product import Product
-from domain.request import Request
 from domain.recommendation import Recommendation
+from domain.request import Request
 
 
 @pytest.fixture

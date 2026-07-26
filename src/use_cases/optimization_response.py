@@ -1,9 +1,11 @@
-"""Wrapper that packages an optimization result (or error) for callers.
+"""
+ROLE: Value Object — packages an optimization result (or error) for callers.
 
-Every call to a solve use case returns an ``OptimizationResponse`` rather
-than a raw ``Recommendation``. This gives callers a uniform object to
-inspect: check ``status``, read the ``recommendation`` on success, or read
-the ``message`` on failure — no exception handling required.
+WHY THIS EXISTS:
+    Every call to a solve use case returns an ``OptimizationResponse`` rather
+    than a raw ``Recommendation``. This gives callers a uniform object to
+    inspect: check ``status``, read the ``recommendation`` on success, or read
+    the ``message`` on failure — no exception handling required.
 """
 
 from __future__ import annotations

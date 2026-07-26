@@ -1,4 +1,4 @@
-"""Integration tests for the optimization Orchestrator."""
+"""Unit tests for the optimization Orchestrator's provider-selection routing."""
 
 import pytest
 
@@ -6,7 +6,7 @@ from domain.product import Product
 from domain.request import Request
 from use_cases.solving.optimization.enumeration.enumeration_solution_provider import EnumerationSolutionProvider
 from use_cases.solving.optimization.heuristic.heuristic_solution_provider import HeuristicSolutionProvider
-from use_cases.solving.optimization.mip_highs.mip_highs import MipHighs
+from use_cases.solving.optimization.mip_highs.mip_highs_solution_provider import MipHighsSolutionProvider
 from use_cases.solving.orchestrator import Orchestrator
 from use_cases.solving.postprocessing.postprocessing import PostProcess
 from use_cases.solving.preprocessing.preprocessing import PreProcess
@@ -14,7 +14,6 @@ from use_cases.solving.preprocessing.preprocessing import PreProcess
 
 @pytest.fixture
 def banana() -> Product:
-    """A product for testing."""
     return Product(name="banana", price_usd=0.5, weight_kg=0.12, calories=89)
 
 
@@ -25,7 +24,7 @@ def _orchestrator(
     return Orchestrator(
         preprocessing=PreProcess(),
         postprocessing=PostProcess(),
-        mip_solution_provider=MipHighs(),
+        mip_solution_provider=MipHighsSolutionProvider(),
         heuristic_solution_provider=HeuristicSolutionProvider(),
         enumeration_solution_provider=EnumerationSolutionProvider(),
         max_products_for_mip=max_products_for_mip,
@@ -33,8 +32,8 @@ def _orchestrator(
     )
 
 
-def test__orchestrator__when_request_is_solvable__returns_recommendation(banana):
-    """ARRANGE: Small combination space (default thresholds) → enumeration."""
+def test__orchestrator__given_solvable_request__returns_recommendation(banana):
+    # ARRANGE — small combination space (default thresholds) routes to enumeration
     request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
     orchestrator = _orchestrator()
 
@@ -48,8 +47,8 @@ def test__orchestrator__when_request_is_solvable__returns_recommendation(banana)
     assert result.total_cost_usd > 0
 
 
-def test__orchestrator__when_no_product_fits__returns_none():
-    """ARRANGE: Budget too tight to afford any product."""
+def test__orchestrator__given_no_product_fits__returns_none():
+    # ARRANGE — budget too tight to afford any product
     expensive = Product(name="expensive", price_usd=100.0, weight_kg=1.0, calories=100)
     request = Request(max_weight_kg=10.0, max_budget_usd=0.01, products=[expensive])
     orchestrator = _orchestrator()
@@ -61,10 +60,10 @@ def test__orchestrator__when_no_product_fits__returns_none():
     assert result is None
 
 
-def test__orchestrator__with_enumeration_disabled__routes_small_request_to_mip(banana):
-    """ARRANGE: max_combinations_for_enumeration=0 forces past enumeration, and
-    a 1-product request stays under the default max_products_for_mip, so this
-    must land on MipHighs."""
+def test__orchestrator__given_enumeration_disabled__routes_small_request_to_mip(banana):
+    # ARRANGE — max_combinations_for_enumeration=0 forces past enumeration, and
+    # a 1-product request stays under the default max_products_for_mip, so this
+    # must land on MipHighsSolutionProvider.
     request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
     orchestrator = _orchestrator(max_combinations_for_enumeration=0)
 
@@ -76,8 +75,8 @@ def test__orchestrator__with_enumeration_disabled__routes_small_request_to_mip(b
     assert result.total_calories > 0
 
 
-def test__orchestrator__with_enumeration_and_mip_disabled__routes_to_heuristic(banana):
-    """ARRANGE: both thresholds forced to 0 leaves only the heuristic path."""
+def test__orchestrator__given_enumeration_and_mip_disabled__routes_to_heuristic(banana):
+    # ARRANGE — both thresholds forced to 0 leaves only the heuristic path
     request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
     orchestrator = _orchestrator(max_products_for_mip=0, max_combinations_for_enumeration=0)
 

@@ -1,8 +1,10 @@
-"""Defines the Product entity: an item the knapsack optimization can select.
+"""
+ROLE: Entity — an item the knapsack optimization can select.
 
-Product has no dependencies on any other layer (services, engine, solvers). Keeping it
-dependency-free means every other layer can depend on Product without risking a circular
-import, and the entity can be tested or reused in isolation from the rest of the framework.
+WHY THIS EXISTS:
+    Product has no dependencies on any other layer (use_cases, adapters, solving). Keeping it
+    dependency-free means every other layer can depend on Product without risking a circular
+    import, and the entity can be tested or reused in isolation from the rest of the framework.
 """
 
 from __future__ import annotations

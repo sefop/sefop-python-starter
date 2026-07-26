@@ -1,9 +1,11 @@
-"""Wrapper that packages a feasibility-evaluation result (or error) for callers.
+"""
+ROLE: Value Object — packages a feasibility-evaluation result (or error) for callers.
 
-Every call to EvaluateSolutionForRequest returns an ``EvaluationResponse``
-rather than a raw ``Recommendation``. This gives callers a uniform object to
-inspect: check ``feasible``, read the totals on success, or read ``message``
-on failure — no exception handling required.
+WHY THIS EXISTS:
+    Every call to EvaluateSolutionForRequest returns an ``EvaluationResponse``
+    rather than a raw ``Recommendation``. This gives callers a uniform object to
+    inspect: check ``feasible``, read the totals on success, or read ``message``
+    on failure — no exception handling required.
 """
 
 from __future__ import annotations
