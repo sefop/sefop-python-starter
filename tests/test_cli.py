@@ -43,7 +43,7 @@ def test__cli_main__given_no_folder_flags__resolves_data_and_output_from_setting
             "products": [{"name": "banana", "priceUsd": 1.00, "weightKg": 0.50, "calories": 100}],
         },
     )
-    monkeypatch.setattr("sys.argv", ["cli", "1"])
+    monkeypatch.setattr("sys.argv", ["cli", "solve", "1"])
 
     # ACT
     with pytest.raises(SystemExit) as exc_info:
