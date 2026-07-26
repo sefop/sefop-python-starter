@@ -9,7 +9,7 @@ This is an internal solving-strategy contract, not a public port: it lives
 inside use_cases/solving/ because only the solving pipeline's own
 collaborators (Orchestrator, MipHighs, HeuristicSolutionProvider,
 EnumerationSolutionProvider) ever implement or call it — it is not something
-adapters/ or bootstrap.py wire in from the outside the way use_cases/ports/
+adapters/ or startup.py wire in from the outside the way use_cases/ports/
 contracts are.
 """
 

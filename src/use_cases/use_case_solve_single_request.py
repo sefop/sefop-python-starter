@@ -25,7 +25,7 @@ class SolveSingleRequest:
     Both collaborators are constructor-injected (Dependency Injection): this
     class only coordinates them, it never builds its own BaseDataLoader or
     Orchestrator. That keeps this use case free to work with any data source
-    or solving pipeline the caller (bootstrap.py) assembles, and lets tests
+    or solving pipeline the caller (startup.py) assembles, and lets tests
     substitute either one without touching this class.
     """
 

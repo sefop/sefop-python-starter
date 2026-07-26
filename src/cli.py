@@ -1,9 +1,9 @@
 """Command-line interface for the knapsack optimizer.
 
 This is the delivery mechanism for the CLI. Its only job is to parse
-arguments and dispatch to whatever bootstrap.py assembles — it never
+arguments and dispatch to whatever startup.py assembles — it never
 constructs a concrete adapter or use case itself; that composition-root
-responsibility belongs entirely to bootstrap.py.
+responsibility belongs entirely to startup.py.
 
 Run with:
     python -m cli solve <request_id>
@@ -19,8 +19,8 @@ from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 
-import bootstrap
-from settings import Settings
+import startup
+from startup import Settings
 from use_cases.ports.base_result_writer import TIMESTAMP_FORMAT
 
 
@@ -80,8 +80,8 @@ def _solve(args: argparse.Namespace, settings: Settings) -> int:
     output_folder = args.output_folder or settings.output_folder_path
     settings = replace(settings, folder_path=data_folder, output_folder_path=output_folder)
 
-    writer = bootstrap.build_result_writer(settings, args.format)
-    solve_single_request = bootstrap.build_solve_single_request(settings)
+    writer = startup.build_result_writer(settings, args.format)
+    solve_single_request = startup.build_solve_single_request(settings)
 
     # Captured before solving starts (rather than left to default inside the
     # use case) so this exact instant can be handed to the solver as the
@@ -110,13 +110,13 @@ def _solve_batch(args: argparse.Namespace, settings: Settings) -> int:
     output_folder = args.output_folder or settings.output_folder_path
     settings = replace(settings, folder_path=args.data_folder, output_folder_path=output_folder)
 
-    writer = bootstrap.build_result_writer(settings, args.format)
-    solve_multiple_requests = bootstrap.build_solve_multiple_requests(settings, args.data_folder)
+    writer = startup.build_result_writer(settings, args.format)
+    solve_multiple_requests = startup.build_solve_multiple_requests(settings, args.data_folder)
     # A second, independent discovery scan: OptimizationResponse carries no
     # request_id field, so the ids returned here are what pairs each response
     # from solve_all() with the input file its writer needs to copy alongside
     # it. Harmless duplicate work -- discovery only reads folder names.
-    request_discovery = bootstrap.build_request_discovery(args.data_folder)
+    request_discovery = startup.build_request_discovery(args.data_folder)
 
     timestamp = datetime.now()
     responses = solve_multiple_requests.solve_all(Path(output_folder), timestamp=timestamp)
@@ -138,7 +138,7 @@ def _evaluate(args: argparse.Namespace, settings: Settings) -> int:
     data_folder = args.data_folder or settings.folder_path
     settings = replace(settings, folder_path=data_folder)
 
-    evaluate_solution_for_request = bootstrap.build_evaluate_solution_for_request(settings)
+    evaluate_solution_for_request = startup.build_evaluate_solution_for_request(settings)
     response = evaluate_solution_for_request.evaluate(args.request_id, Path(args.solution_path))
 
     if response.feasible:

@@ -4,7 +4,7 @@ ROLE: Implementation of BaseResultWriter that saves each run as JSON files.
 WHY THIS EXISTS:
     Mirrors CsvResultWriter's responsibilities (copy input, write status,
     write solution) using JSON instead of CSV/plain text, so a run's output
-    format is a choice made once at the composition root (bootstrap.py)
+    format is a choice made once at the composition root (startup.py)
     rather than a hardcoded assumption baked into the rest of the system.
 """
 

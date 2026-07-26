@@ -1,20 +1,29 @@
-"""Composition root: assembles the object graph for the CLI.
+"""Configuration and composition root for the application.
 
-This is the only module in the codebase allowed to import concrete adapters
-and construct concrete use cases directly. cli.py calls these factory
-functions instead of constructing anything itself, so every other module can
-depend on abstract ports (use_cases/ports/) without knowing which concrete
-adapter ultimately gets wired in.
+This module has two jobs, kept together because they're two sides of the
+same coin:
+
+1. Hold every configurable value (the `Settings` dataclass) in one place,
+   rather than scattered as literal strings across the codebase. A data
+   scientist forking this repository to point at their own data or output
+   folder only needs to edit `Settings` here.
+2. Assemble the object graph the CLI needs (the `build_*` factory
+   functions). This is the only module in the codebase allowed to import
+   concrete adapters and construct concrete use cases directly. cli.py calls
+   these factory functions instead of constructing anything itself, so every
+   other module can depend on abstract ports (use_cases/ports/) without
+   knowing which concrete adapter ultimately gets wired in.
 """
 
 from __future__ import annotations
+
+from dataclasses import dataclass
 
 from adapters.csv_result_writer import CsvResultWriter
 from adapters.directory_request_discovery import DirectoryRequestDiscovery
 from adapters.json_data_loader import JsonDataLoader
 from adapters.json_result_writer import JsonResultWriter
 from adapters.json_solution_loader import JsonSolutionLoader
-from settings import Settings
 from use_cases.ports.base_request_discovery import BaseRequestDiscovery
 from use_cases.ports.base_result_writer import BaseResultWriter
 from use_cases.solving.optimization.enumeration.enumeration_solution_provider import EnumerationSolutionProvider
@@ -27,6 +36,23 @@ from use_cases.solving.preprocessing.preprocessing import PreProcess
 from use_cases.use_case_evaluate_solution_for_request import EvaluateSolutionForRequest
 from use_cases.use_case_solve_multiple_requests import SolveMultipleRequests
 from use_cases.use_case_solve_single_request import SolveSingleRequest
+
+
+@dataclass
+class Settings:
+    """Holds all configurable values for the application.
+
+    Attributes:
+        folder_path: Root directory where request subfolders live
+            (data/1/data.json, data/2/data.json, …).
+        solver_name: Solver technology passed to the MIP strategy.
+        output_folder_path: Root directory each run's input and solution
+            files are written under (output/1/<timestamp>/, …).
+    """
+
+    folder_path: str = "data"
+    solver_name: str = "highs"
+    output_folder_path: str = "output"
 
 
 def build_mip_solution_provider(settings: Settings) -> SolutionProvider:

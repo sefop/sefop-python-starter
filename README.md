@@ -66,16 +66,17 @@ The solver picks 4 apples — chocolate costs 10× more per calorie, so it never
 
 ## Repository structure
 
-This project follows a simplified **Clean Architecture**: three layers
+This project follows a simplified **[Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)**: three layers
 (`domain/`, `use_cases/`, `adapters/`), full manual dependency injection, and
-a single composition root (`bootstrap.py`) that wires everything together.
+a single composition root (`startup.py`) that wires everything together.
 
 ```
 src/
 ├── cli.py                     # argparse subparsers + dispatch only — no wiring
-├── bootstrap.py                # composition root — the only place concrete
-│                                # adapters and use cases get constructed
-├── settings.py                 # plain dataclass: folder_path, solver_name, output_folder_path
+├── startup.py                  # config (Settings: folder_path, solver_name,
+│                                # output_folder_path) + composition root —
+│                                # the only place concrete adapters and use
+│                                # cases get constructed
 ├── domain/                     # pure entities — Product, Request, Recommendation
 ├── use_cases/
 │   ├── ports/                          # abstract interfaces (ABCs) the use cases depend on
@@ -109,7 +110,7 @@ Dependencies only point inward: `adapters/` imports from `use_cases/`, never the
 reverse; `use_cases/solving/` internals (`SolutionProvider` and its three
 implementations) are separate from the public ports in `use_cases/ports/` —
 they are pluggable providers used only within the solving pipeline itself,
-not something `adapters/` or `bootstrap.py` implement directly (`bootstrap.py`
+not something `adapters/` or `startup.py` implement directly (`startup.py`
 only decides *which* MIP technology's `SolutionProvider` to construct).
 
 ---
@@ -217,7 +218,7 @@ where `candidate_solution.json` maps product name to candidate quantity:
 
 This project follows a simplified **Clean Architecture** with three layers and
 full dependency inversion — every collaborator is constructor-injected, and
-`bootstrap.py` is the single place concrete objects get wired together:
+`startup.py` is the single place concrete objects get wired together:
 
 1. **`domain/`** — Pure business logic (Product, Request, Recommendation) with no external dependencies.
 2. **`use_cases/`** — Application rules, expressed as three independent use case classes (no shared base — their signatures genuinely differ):
@@ -235,10 +236,10 @@ full dependency inversion — every collaborator is constructor-injected, and
      - **`mip/mip_highs.py`** — Exact MIP solver. Builds variables/constraints/objective directly against `highspy` and solves — no intermediate solver-agnostic model. This is deliberately self-contained per solver technology (rather than sharing a formulation layer across technologies) so a second technology (e.g. Google OR-Tools) can be added later as its own independent `SolutionProvider` implementation without touching this one.
      - **`heuristic/heuristic_solution_provider.py`** — Fast, approximate greedy solution for large problems.
 
-     `SolutionProvider` is an internal solving-strategy contract, separate from the public ports in `use_cases/ports/` — `bootstrap.py` decides which concrete `SolutionProvider` to use for the MIP slot (via `Settings.solver_name`), but `Orchestrator` itself only ever depends on the abstract type.
+     `SolutionProvider` is an internal solving-strategy contract, separate from the public ports in `use_cases/ports/` — `startup.py` decides which concrete `SolutionProvider` to use for the MIP slot (via `Settings.solver_name`), but `Orchestrator` itself only ever depends on the abstract type.
    - **`solving/postprocessing/`** — Refines the recommendation (e.g., sorts products by quantity).
 3. **`adapters/`** — All I/O: concrete implementations of the `use_cases/ports/` interfaces (`JsonDataLoader`, `CsvResultWriter`/`JsonResultWriter`, `DirectoryRequestDiscovery`, `JsonSolutionLoader`).
-4. **`bootstrap.py`** — The composition root: factory functions that assemble the full object graph, including resolving `Settings.solver_name` to a concrete solver.
-5. **`cli.py`** — Parses arguments and dispatches to `bootstrap.py`; it never constructs a concrete adapter or use case itself.
+4. **`startup.py`** — Configuration (`Settings`) plus the composition root: factory functions that assemble the full object graph, including resolving `Settings.solver_name` to a concrete solver.
+5. **`cli.py`** — Parses arguments and dispatches to `startup.py`; it never constructs a concrete adapter or use case itself.
 
 ---
