@@ -7,10 +7,9 @@ from domain.product import Product
 from domain.request import Request
 from use_cases.ports.base_data_loader import BaseDataLoader
 from use_cases.ports.base_request_discovery import BaseRequestDiscovery
-from use_cases.solving.optimization.heuristic.greedy_calories import GreedyCalories
-from use_cases.solving.optimization.mip.mip_strategy import MipStrategy
-from use_cases.solving.optimization.mip.optimization.optimization import Optimization
-from use_cases.solving.optimization.mip.optimization.solvers.highs_solver import HighsSolver
+from use_cases.solving.optimization.enumeration.enumeration_solution_provider import EnumerationSolutionProvider
+from use_cases.solving.optimization.heuristic.heuristic_solution_provider import HeuristicSolutionProvider
+from use_cases.solving.optimization.mip.mip_highs import MipHighs
 from use_cases.solving.orchestrator import Orchestrator
 from use_cases.solving.postprocessing.postprocessing import PostProcess
 from use_cases.solving.preprocessing.preprocessing import PreProcess
@@ -38,8 +37,9 @@ def _orchestrator() -> Orchestrator:
     return Orchestrator(
         preprocessing=PreProcess(),
         postprocessing=PostProcess(),
-        mip_strategy=MipStrategy(optimization=Optimization(solver=HighsSolver())),
-        heuristic_strategy=GreedyCalories(),
+        mip_solution_provider=MipHighs(),
+        heuristic_solution_provider=HeuristicSolutionProvider(),
+        enumeration_solution_provider=EnumerationSolutionProvider(),
     )
 
 

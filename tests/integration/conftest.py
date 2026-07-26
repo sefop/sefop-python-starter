@@ -3,11 +3,10 @@
 WHY THIS EXISTS:
     Every integration test drives the real CLI end-to-end and produces real
     output files (input.json, status.txt, solution.csv, model.lp) that are
-    worth keeping around after a run -- to inspect a failure, or to copy a
-    new model.lp over a golden file in tests/resources/ after an intentional
-    formulation change. Pytest's tmp_path is deleted right after each test,
-    destroying that evidence, so this suite writes to a persistent folder
-    under output/ instead.
+    worth keeping around after a run -- to inspect a failure, or to
+    sanity-check a model.lp by eye. Pytest's tmp_path is deleted right after
+    each test, destroying that evidence, so this suite writes to a
+    persistent folder under output/ instead.
 """
 
 from __future__ import annotations

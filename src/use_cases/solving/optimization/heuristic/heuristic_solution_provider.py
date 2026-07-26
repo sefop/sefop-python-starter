@@ -11,11 +11,11 @@ from math import floor
 from pathlib import Path
 
 from domain.recommendation import Recommendation
-from use_cases.solving.optimization.optimization_strategy import OptimizationStrategy
+from use_cases.solving.optimization.solution_provider import SolutionProvider
 from use_cases.solving.preprocessing.pre_processed_data import PreProcessedData
 
 
-class GreedyCalories(OptimizationStrategy):
+class HeuristicSolutionProvider(SolutionProvider):
     """Greedy knapsack solver that prioritizes calorie-dense products.
 
     This is a *heuristic* — it does not guarantee the mathematically
@@ -23,18 +23,18 @@ class GreedyCalories(OptimizationStrategy):
     in practice for the calorie-maximization objective.
     """
 
-    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
+    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> list[Recommendation]:
         """Greedily select products ranked by calories per kg.
 
         Args:
             data: The preprocessed knapsack data with products and constraints.
             output_dir: Unused. This heuristic builds no solver model, so it
                 has no debugging artifact to write; the parameter exists only
-                to satisfy the shared OptimizationStrategy interface.
+                to satisfy the shared SolutionProvider interface.
 
         Returns:
-            A Recommendation with the selected quantities, or None if no
-            product fits within the weight and budget constraints.
+            A list containing the single Recommendation found, or an empty
+            list if no product fits within the weight and budget constraints.
         """
         request = data.request
         sorted_products = sorted(
@@ -57,6 +57,6 @@ class GreedyCalories(OptimizationStrategy):
                 remaining_budget -= qty * product.price_usd
 
         if not quantities:
-            return None
+            return []
 
-        return Recommendation(request=request, quantities=quantities)
+        return [Recommendation(request=request, quantities=quantities)]

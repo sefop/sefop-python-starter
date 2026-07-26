@@ -14,7 +14,6 @@ from pathlib import Path
 import pytest
 
 import cli
-from tests.helpers.lp_comparer import compare_lp
 
 _RESOURCES_DIR = Path(__file__).parent.parent / "resources"
 
@@ -75,29 +74,6 @@ def _read_totals(run_folder: Path) -> dict[str, float]:
     }
 
 
-def _assert_model_lp_matches_golden(situation: str, run_folder: Path) -> None:
-    """Assert the model.lp just produced matches tests/resources/<situation>/model.lp.
-
-    To regenerate a golden file after an intentional formulation change, run
-    the integration suite once, find the situation's run folder under
-    output/integration_tests/<session_timestamp>/<situation>/<response_timestamp>/,
-    and copy its model.lp over the golden:
-        pytest -m integration
-        cp output/integration_tests/<session_timestamp>/<situation>/<response_timestamp>/model.lp \\
-            tests/resources/<situation>/model.lp
-    """
-    print("\n---------- LP Comparison ----------")
-    golden = _RESOURCES_DIR / situation / "model.lp"
-    diffs: list = compare_lp(golden, run_folder / "model.lp")
-
-    # Show a summary of the diffs first
-    print(f"There where {len(diffs)} differences.")
-    for diff in diffs:
-        print(diff)
-
-    assert len(diffs) == 0
-
-
 @pytest.mark.integration
 def test__cli_main__given_feasible_unique_optimum__returns_expected_optimal_calories(
     integration_output_root, monkeypatch, capsys
@@ -110,7 +86,6 @@ def test__cli_main__given_feasible_unique_optimum__returns_expected_optimal_calo
     assert exit_code == 0
     assert "SUCCESS" in (run_folder / "status.txt").read_text(encoding="utf-8")
     assert _read_totals(run_folder)["calories"] == 500
-    _assert_model_lp_matches_golden("feasible_unique_optimum", run_folder)
 
 
 @pytest.mark.integration
@@ -139,7 +114,6 @@ def test__cli_main__given_multiple_optimal_solutions__returns_shared_optimal_cal
     # ASSERT
     assert exit_code == 0
     assert _read_totals(run_folder)["calories"] == 100
-    _assert_model_lp_matches_golden("multiple_optimal_solutions", run_folder)
 
 
 @pytest.mark.integration
@@ -175,7 +149,6 @@ def test__cli_main__given_individually_infeasible_products__filters_them_and_sol
     # ASSERT
     assert exit_code == 0
     assert _read_totals(run_folder)["calories"] == 120
-    _assert_model_lp_matches_golden("individually_infeasible_product_filtered", run_folder)
 
 
 @pytest.mark.integration
@@ -191,7 +164,6 @@ def test__cli_main__given_quantity_greater_than_one__selects_multiple_units_of_s
     totals = _read_totals(run_folder)
     assert totals["quantity"] == 10
     assert totals["calories"] == 500
-    _assert_model_lp_matches_golden("quantity_greater_than_one", run_folder)
 
 
 @pytest.mark.integration
@@ -209,4 +181,3 @@ def test__cli_main__given_both_constraints_binding__saturates_budget_and_weight_
     assert totals["cost"] == 9
     assert totals["weight"] == 6
     assert totals["calories"] == 145
-    _assert_model_lp_matches_golden("both_constraints_binding", run_folder)

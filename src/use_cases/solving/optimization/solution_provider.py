@@ -1,0 +1,51 @@
+"""Contract that every solution provider must follow.
+
+Solution providers (MIP solver, greedy heuristic, brute-force enumeration,
+etc.) are pluggable implementations of this interface so Orchestrator can
+select and run any of them through a single ``solve()`` call without knowing
+which one it picked.
+
+This is an internal solving-strategy contract, not a public port: it lives
+inside use_cases/solving/ because only the solving pipeline's own
+collaborators (Orchestrator, MipHighs, HeuristicSolutionProvider,
+EnumerationSolutionProvider) ever implement or call it — it is not something
+adapters/ or bootstrap.py wire in from the outside the way use_cases/ports/
+contracts are.
+"""
+
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from pathlib import Path
+
+from domain.recommendation import Recommendation
+from use_cases.solving.preprocessing.pre_processed_data import PreProcessedData
+
+
+class SolutionProvider(ABC):
+    """
+    An abstract base class (ABC) is like a contract: it declares a set of
+    methods that every provider **must** implement, but says nothing about
+    *how*. Any class that inherits from ``SolutionProvider`` is forced to
+    provide a ``solve()`` method, so Orchestrator can call ``solve()``
+    without caring whether an exact MIP solver, a greedy heuristic, or
+    brute-force enumeration is doing the work behind the scenes.
+    """
+
+    @abstractmethod
+    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> list[Recommendation]:
+        """Solve the optimization problem for the given data.
+
+        Args:
+            data: The preprocessed knapsack request and related context.
+            output_dir: Directory to write solver debugging artifacts into,
+                or None to skip writing any. Providers that produce no such
+                artifacts (e.g. the greedy heuristic) simply ignore this.
+
+        Returns:
+            A list of feasible Recommendations: empty if none exists, or
+            exactly one element (the provider's answer) otherwise. Providers
+            do not currently surface multiple candidate solutions or ties —
+            callers must not assume the list is sorted or scored beyond
+            "index 0 is the provider's answer."
+        """

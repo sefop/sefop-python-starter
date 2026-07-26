@@ -4,10 +4,9 @@ import pytest
 
 from domain.product import Product
 from domain.request import Request
-from use_cases.solving.optimization.heuristic.greedy_calories import GreedyCalories
-from use_cases.solving.optimization.mip.mip_strategy import MipStrategy
-from use_cases.solving.optimization.mip.optimization.optimization import Optimization
-from use_cases.solving.optimization.mip.optimization.solvers.highs_solver import HighsSolver
+from use_cases.solving.optimization.enumeration.enumeration_solution_provider import EnumerationSolutionProvider
+from use_cases.solving.optimization.heuristic.heuristic_solution_provider import HeuristicSolutionProvider
+from use_cases.solving.optimization.mip.mip_highs import MipHighs
 from use_cases.solving.orchestrator import Orchestrator
 from use_cases.solving.postprocessing.postprocessing import PostProcess
 from use_cases.solving.preprocessing.preprocessing import PreProcess
@@ -19,17 +18,23 @@ def banana() -> Product:
     return Product(name="banana", price_usd=0.5, weight_kg=0.12, calories=89)
 
 
-def _orchestrator() -> Orchestrator:
+def _orchestrator(
+    max_products_for_mip: int = 50,
+    max_combinations_for_enumeration: int = 1000,
+) -> Orchestrator:
     return Orchestrator(
         preprocessing=PreProcess(),
         postprocessing=PostProcess(),
-        mip_strategy=MipStrategy(optimization=Optimization(solver=HighsSolver())),
-        heuristic_strategy=GreedyCalories(),
+        mip_solution_provider=MipHighs(),
+        heuristic_solution_provider=HeuristicSolutionProvider(),
+        enumeration_solution_provider=EnumerationSolutionProvider(),
+        max_products_for_mip=max_products_for_mip,
+        max_combinations_for_enumeration=max_combinations_for_enumeration,
     )
 
 
 def test__orchestrator__when_request_is_solvable__returns_recommendation(banana):
-    """ARRANGE: Small request (≤50 products) → MIP solver."""
+    """ARRANGE: Small combination space (default thresholds) → enumeration."""
     request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
     orchestrator = _orchestrator()
 
@@ -54,3 +59,33 @@ def test__orchestrator__when_no_product_fits__returns_none():
 
     # ASSERT — No product fits, so no recommendation exists
     assert result is None
+
+
+def test__orchestrator__with_enumeration_disabled__routes_small_request_to_mip(banana):
+    """ARRANGE: max_combinations_for_enumeration=0 forces past enumeration, and
+    a 1-product request stays under the default max_products_for_mip, so this
+    must land on MipHighs."""
+    request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
+    orchestrator = _orchestrator(max_combinations_for_enumeration=0)
+
+    # ACT
+    result = orchestrator.solve(request)
+
+    # ASSERT
+    assert result is not None
+    assert result.total_calories > 0
+
+
+def test__orchestrator__with_enumeration_and_mip_disabled__routes_to_heuristic(banana):
+    """ARRANGE: both thresholds forced to 0 leaves only the heuristic path."""
+    request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana])
+    orchestrator = _orchestrator(max_products_for_mip=0, max_combinations_for_enumeration=0)
+
+    # ACT
+    result = orchestrator.solve(request)
+
+    # ASSERT — the heuristic isn't guaranteed optimal, only feasible
+    assert result is not None
+    assert result.total_calories > 0
+    assert result.total_cost_usd <= 10.0
+    assert result.total_weight_kg <= 5.0

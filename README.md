@@ -90,10 +90,11 @@ src/
 │   ├── use_case_evaluate_solution_for_request.py # feasibility-check a candidate solution
 │   └── solving/                        # internal implementation detail of the
 │       │                                # solve use cases — not a top-level layer
-│       ├── orchestrator.py             # pipeline coordinator: pre → strategy → post
+│       ├── orchestrator.py             # pipeline coordinator: pre → provider → post
 │       ├── preprocessing/              # filter infeasible products before solving
 │       ├── postprocessing/             # sort and refine the recommendation
-│       └── optimization/               # MIP solver and greedy heuristic strategies
+│       └── optimization/               # SolutionProvider + 3 implementations:
+│                                        # enumeration (brute force), MIP (HiGHS), heuristic
 └── adapters/                   # concrete implementations of use_cases/ports/
     ├── json_data_loader.py
     ├── csv_result_writer.py
@@ -105,10 +106,11 @@ data/                   # sample problem instances
 ```
 
 Dependencies only point inward: `adapters/` imports from `use_cases/`, never the
-reverse; `use_cases/solving/` internals (`OptimizationStrategy`,
-`BaseTechnologySolver`) are separate from the public ports in
-`use_cases/ports/` — they are pluggable strategies used only within the
-solving pipeline itself, not something `adapters/` or `bootstrap.py` implement.
+reverse; `use_cases/solving/` internals (`SolutionProvider` and its three
+implementations) are separate from the public ports in `use_cases/ports/` —
+they are pluggable providers used only within the solving pipeline itself,
+not something `adapters/` or `bootstrap.py` implement directly (`bootstrap.py`
+only decides *which* MIP technology's `SolutionProvider` to construct).
 
 ---
 
@@ -155,7 +157,7 @@ pytest -m "not integration"
 ```bash
 pytest -m integration
 ```
-Each integration test drives the real CLI end-to-end against a pre-built "situation" (`tests/resources/<situation>/`) and checks two things: that the generated formulation (`model.lp`) matches a golden file, so an unintended change to the model is caught even though the formulation is otherwise only unit-tested in isolation; and situation-specific conditions on the outcome — e.g. the expected optimal calories, that an infeasible request exits non-zero and writes no solution, that tied optimal solutions still report the shared optimal total, or that a large instance correctly routes to the heuristic instead of the MIP solver.
+Each integration test drives the real CLI end-to-end against a pre-built "situation" (`tests/resources/<situation>/`) and checks situation-specific conditions on the observable outcome only — e.g. the expected optimal calories, that an infeasible request exits non-zero and writes no solution, that tied optimal solutions still report the shared optimal total, or that a large instance correctly routes to the heuristic instead of the exact solvers. Formulation correctness (is the MIP model built right?) is checked separately and only at the unit level, by comparing `MipHighs`'s output against `EnumerationSolutionProvider`'s brute-force ground truth — see `tests/use_cases/solving/optimization/test_providers_agree_with_enumeration.py` — not by diffing a generated `model.lp` against a golden file.
 
 ### Run tests by layer
 ```bash
@@ -226,11 +228,14 @@ full dependency inversion — every collaborator is constructor-injected, and
    Abstract ports the use cases depend on (`BaseDataLoader`, `BaseResultWriter`, `BaseRequestDiscovery`, `BaseSolutionLoader`) live in `use_cases/ports/`.
 
    The solving pipeline itself lives in **`use_cases/solving/`** — an internal implementation detail of `SolveSingleRequest`, not a top-level architecture layer:
-   - **`solving/orchestrator.py`** — Pipeline coordinator: runs preprocessing → picks a strategy → runs postprocessing.
+   - **`solving/orchestrator.py`** — Pipeline coordinator: runs preprocessing → picks a `SolutionProvider` → runs postprocessing. Picks based on problem size: a small enough combinatorial search space routes to brute-force enumeration; otherwise a small enough product count routes to the exact MIP solver; anything larger falls back to the fast heuristic.
    - **`solving/preprocessing/`** — Filters out products that can never be selected (individually infeasible).
-   - **`solving/optimization/`** — Solver implementations:
-     - **Greedy heuristic** — fast, approximate solution for large problems.
-     - **MIP solver** — first assembles a **solver-agnostic model** (the formulation: variables, constraints, objective, in `model_abstraction/`, built from `components/`) using pure Python with no solver dependency. Only once that model exists is it handed to a technology-specific solver (`solvers/highs_solver.py`) to actually optimize. Because the formulation is a plain Python object, it can be unit-tested on its own — see `tests/use_cases/solving/optimization/mip/optimization/model_abstraction/` and `.../components/` — independent of whether HiGHS or any other solver is installed. `OptimizationStrategy` and `BaseTechnologySolver` are internal solving-strategy contracts, separate from the public ports in `use_cases/ports/`.
+   - **`solving/optimization/`** — `SolutionProvider` (the shared ABC: `solve(data, output_dir) -> list[Recommendation]`) and three implementations:
+     - **`enumeration/enumeration_solution_provider.py`** — Brute-force exact solver: tries every feasible product-quantity combination and keeps the best. Used both as a real, fast solving path for small requests and as the ground-truth oracle other providers' tests are checked against.
+     - **`mip/mip_highs.py`** — Exact MIP solver. Builds variables/constraints/objective directly against `highspy` and solves — no intermediate solver-agnostic model. This is deliberately self-contained per solver technology (rather than sharing a formulation layer across technologies) so a second technology (e.g. Google OR-Tools) can be added later as its own independent `SolutionProvider` implementation without touching this one.
+     - **`heuristic/heuristic_solution_provider.py`** — Fast, approximate greedy solution for large problems.
+
+     `SolutionProvider` is an internal solving-strategy contract, separate from the public ports in `use_cases/ports/` — `bootstrap.py` decides which concrete `SolutionProvider` to use for the MIP slot (via `Settings.solver_name`), but `Orchestrator` itself only ever depends on the abstract type.
    - **`solving/postprocessing/`** — Refines the recommendation (e.g., sorts products by quantity).
 3. **`adapters/`** — All I/O: concrete implementations of the `use_cases/ports/` interfaces (`JsonDataLoader`, `CsvResultWriter`/`JsonResultWriter`, `DirectoryRequestDiscovery`, `JsonSolutionLoader`).
 4. **`bootstrap.py`** — The composition root: factory functions that assemble the full object graph, including resolving `Settings.solver_name` to a concrete solver.
