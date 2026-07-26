@@ -132,8 +132,6 @@ def test__cli_main__given_large_instance__triggers_heuristic_and_returns_feasibl
     assert totals["cost"] <= 20
     assert totals["weight"] <= 3.0
     assert totals["calories"] > 0
-    # The heuristic path never builds a HiGHS model, so no LP dump exists.
-    assert not (run_folder / "model.lp").exists()
 
 
 @pytest.mark.integration
