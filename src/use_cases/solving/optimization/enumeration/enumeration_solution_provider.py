@@ -63,7 +63,7 @@ class EnumerationSolutionProvider(SolutionProvider):
     silently drift apart.
     """
 
-    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> list[Recommendation]:
+    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Exhaustively search every product-quantity combination.
 
         Args:
@@ -73,8 +73,8 @@ class EnumerationSolutionProvider(SolutionProvider):
                 to satisfy the shared SolutionProvider interface.
 
         Returns:
-            A list containing the single best Recommendation found, or an
-            empty list if no combination is feasible.
+            The single best Recommendation found, or None if no combination
+            is feasible.
         """
         request = data.request
         products = []
@@ -107,4 +107,4 @@ class EnumerationSolutionProvider(SolutionProvider):
             if best is None or candidate.total_calories > best.total_calories:
                 best = candidate
 
-        return [best] if best is not None else []
+        return best

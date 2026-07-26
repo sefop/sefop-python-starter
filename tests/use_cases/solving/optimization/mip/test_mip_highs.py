@@ -24,14 +24,14 @@ def preprocessed_data(banana, chips) -> PreProcessedData:
 
 def test__solve__recommendation_maps_solved_quantities_back_to_the_right_products(preprocessed_data, banana, chips):
     # ACT
-    recommendations = MipHighs().solve(preprocessed_data)
+    recommendation = MipHighs().solve(preprocessed_data)
 
     # ASSERT — the solver only ever sees "quantity_<name>" variable names;
     # this proves the reverse lookup in _extract_recommendation correctly
     # maps them back to the actual Product objects, not e.g. raising KeyError
     # or mixing up products.
-    assert recommendations
-    for product in recommendations[0].quantities:
+    assert recommendation is not None
+    for product in recommendation.quantities:
         assert product in {banana, chips}
 
 

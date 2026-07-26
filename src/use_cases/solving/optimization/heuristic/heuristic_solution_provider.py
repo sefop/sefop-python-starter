@@ -23,7 +23,7 @@ class HeuristicSolutionProvider(SolutionProvider):
     in practice for the calorie-maximization objective.
     """
 
-    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> list[Recommendation]:
+    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Greedily select products ranked by calories per kg.
 
         Args:
@@ -33,8 +33,8 @@ class HeuristicSolutionProvider(SolutionProvider):
                 to satisfy the shared SolutionProvider interface.
 
         Returns:
-            A list containing the single Recommendation found, or an empty
-            list if no product fits within the weight and budget constraints.
+            The single Recommendation found, or None if no product fits
+            within the weight and budget constraints.
         """
         request = data.request
         sorted_products = sorted(
@@ -57,6 +57,6 @@ class HeuristicSolutionProvider(SolutionProvider):
                 remaining_budget -= qty * product.price_usd
 
         if not quantities:
-            return []
+            return None
 
-        return [Recommendation(request=request, quantities=quantities)]
+        return Recommendation(request=request, quantities=quantities)

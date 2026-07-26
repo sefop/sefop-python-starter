@@ -15,7 +15,7 @@ def chips() -> Product:
     return Product(name="chips", price_usd=1.0, weight_kg=0.2, calories=150)
 
 
-def test__solve__when_no_product_fits__returns_empty_list():
+def test__solve__when_no_product_fits__returns_none():
     # ARRANGE — budget too tight for any product
     heavy = Product(name="heavy", price_usd=100.0, weight_kg=10.0, calories=500)
     request = Request(max_weight_kg=1.0, max_budget_usd=0.01, products=[heavy])
@@ -26,7 +26,7 @@ def test__solve__when_no_product_fits__returns_empty_list():
     result = provider.solve(data)
 
     # ASSERT
-    assert result == []
+    assert result is None
 
 
 def test__solve__picks_maximum_feasible_quantity(banana):
@@ -39,8 +39,8 @@ def test__solve__picks_maximum_feasible_quantity(banana):
     result = provider.solve(data)
 
     # ASSERT
-    assert result
-    assert result[0].quantities[banana] == 3
+    assert result is not None
+    assert result.quantities[banana] == 3
 
 
 def test__solve__falls_through_to_next_product_when_primary_is_exhausted(banana, chips):
@@ -57,9 +57,9 @@ def test__solve__falls_through_to_next_product_when_primary_is_exhausted(banana,
     result = provider.solve(data)
 
     # ASSERT
-    assert result
-    assert chips in result[0].quantities
-    assert banana in result[0].quantities
+    assert result is not None
+    assert chips in result.quantities
+    assert banana in result.quantities
 
 
 def test__solve__picks_highest_calorie_density_first(banana, chips):
@@ -75,5 +75,5 @@ def test__solve__picks_highest_calorie_density_first(banana, chips):
     result = provider.solve(data)
 
     # ASSERT
-    assert result
-    assert chips in result[0].quantities
+    assert result is not None
+    assert chips in result.quantities

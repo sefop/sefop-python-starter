@@ -91,10 +91,10 @@ class Orchestrator:
             logger.warning("No feasible products after preprocessing; skipping solve")
             return None
         provider = self._select_provider(data)
-        recommendations = provider.solve(data, output_dir)
-        if not recommendations:
+        recommendation = provider.solve(data, output_dir)
+        if recommendation is None:
             return None
-        return self._postprocessing.run(recommendations[0])
+        return self._postprocessing.run(recommendation)
 
     def _select_provider(self, data: PreProcessedData) -> SolutionProvider:
         """Choose enumeration, MIP, or the greedy heuristic based on problem size.

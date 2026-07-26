@@ -35,9 +35,9 @@ def soda() -> Product:
 
 
 def _oracle_calories(data: PreProcessedData) -> int:
-    recommendations = EnumerationSolutionProvider().solve(data)
-    assert recommendations, "test fixture must be feasible"
-    return recommendations[0].total_calories
+    recommendation = EnumerationSolutionProvider().solve(data)
+    assert recommendation is not None, "test fixture must be feasible"
+    return recommendation.total_calories
 
 
 @pytest.mark.parametrize(
@@ -57,8 +57,8 @@ def test__mip_highs__matches_enumeration_oracle_on_small_instances(banana, chips
     mip_result = MipHighs().solve(data)
 
     # ASSERT — MIP is exact, so it must match the brute-force optimum exactly.
-    assert mip_result
-    assert mip_result[0].total_calories == _oracle_calories(data)
+    assert mip_result is not None
+    assert mip_result.total_calories == _oracle_calories(data)
 
 
 @pytest.mark.parametrize(
@@ -82,5 +82,5 @@ def test__heuristic__is_feasible_and_never_beats_the_enumeration_oracle(
     heuristic_result = HeuristicSolutionProvider().solve(data)
 
     # ASSERT
-    assert heuristic_result
-    assert heuristic_result[0].total_calories <= _oracle_calories(data)
+    assert heuristic_result is not None
+    assert heuristic_result.total_calories <= _oracle_calories(data)

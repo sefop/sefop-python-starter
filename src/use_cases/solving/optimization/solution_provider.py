@@ -33,7 +33,7 @@ class SolutionProvider(ABC):
     """
 
     @abstractmethod
-    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> list[Recommendation]:
+    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Solve the optimization problem for the given data.
 
         Args:
@@ -43,9 +43,7 @@ class SolutionProvider(ABC):
                 artifacts (e.g. the greedy heuristic) simply ignore this.
 
         Returns:
-            A list of feasible Recommendations: empty if none exists, or
-            exactly one element (the provider's answer) otherwise. Providers
-            do not currently surface multiple candidate solutions or ties —
-            callers must not assume the list is sorted or scored beyond
-            "index 0 is the provider's answer."
+            The provider's best Recommendation, or None if no feasible
+            solution exists. Providers do not currently surface multiple
+            candidate solutions or ties.
         """

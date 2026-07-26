@@ -48,7 +48,7 @@ class MipHighs(SolutionProvider):
     Where x_i is the number of units of product i selected.
     """
 
-    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> list[Recommendation]:
+    def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Build, solve, and extract a Recommendation from the MIP model.
 
         Args:
@@ -59,8 +59,8 @@ class MipHighs(SolutionProvider):
                 useful when a solution looks wrong. Pass None to skip writing it.
 
         Returns:
-            A list containing the single optimal Recommendation, or an empty
-            list if no feasible solution exists.
+            The single optimal Recommendation, or None if no feasible
+            solution exists.
         """
         request = data.request
         # Wrapping feasible_products in a temporary Request lets column
@@ -87,8 +87,7 @@ class MipHighs(SolutionProvider):
         status = highs_model.getModelStatus()
         logger.info("HiGHS terminated with status: %s", status)
 
-        recommendation = self._extract_recommendation(request, feasible_request, status, highs_model)
-        return [recommendation] if recommendation is not None else []
+        return self._extract_recommendation(request, feasible_request, status, highs_model)
 
     def _add_variables(self, request: Request, highs_model: highspy.Highs) -> dict[str, int]:
         """Add one non-negative integer variable per product.

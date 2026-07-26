@@ -27,15 +27,15 @@ def test__solve__known_optimum__returns_the_best_combination(banana, chips):
     data = PreProcessedData(request=request, feasible_products=[banana, chips])
 
     # ACT
-    recommendations = EnumerationSolutionProvider().solve(data)
+    recommendation = EnumerationSolutionProvider().solve(data)
 
     # ASSERT
-    assert len(recommendations) == 1
-    assert recommendations[0].total_calories == 40
-    assert recommendations[0].quantities == {banana: 4}
+    assert recommendation is not None
+    assert recommendation.total_calories == 40
+    assert recommendation.quantities == {banana: 4}
 
 
-def test__solve__given_no_feasible_products__returns_empty_list():
+def test__solve__given_no_feasible_products__returns_none():
     # ARRANGE — Request requires a non-empty product catalogue, but
     # feasible_products (what preprocessing decided actually fits) can still
     # be empty, simulating "nothing survived preprocessing" without needing
@@ -45,7 +45,7 @@ def test__solve__given_no_feasible_products__returns_empty_list():
     data = PreProcessedData(request=request, feasible_products=[])
 
     # ACT / ASSERT
-    assert EnumerationSolutionProvider().solve(data) == []
+    assert EnumerationSolutionProvider().solve(data) is None
 
 
 def test__solve__tie_between_equal_products__keeps_first_enumerated_combination():
@@ -63,10 +63,11 @@ def test__solve__tie_between_equal_products__keeps_first_enumerated_combination(
     data = PreProcessedData(request=request, feasible_products=[cookie_a, cookie_b])
 
     # ACT
-    recommendations = EnumerationSolutionProvider().solve(data)
+    recommendation = EnumerationSolutionProvider().solve(data)
 
     # ASSERT
-    assert recommendations[0].quantities == {cookie_b: 1}
+    assert recommendation is not None
+    assert recommendation.quantities == {cookie_b: 1}
 
 
 def test__combination_count__matches_product_of_per_product_bounds(banana, chips):

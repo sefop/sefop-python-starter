@@ -70,40 +70,60 @@ This project follows a simplified **[Clean Architecture](https://blog.cleancoder
 (`domain/`, `use_cases/`, `adapters/`), full manual [Dependency Injection](https://www.geeksforgeeks.org/system-design/dependency-injectiondi-design-pattern/), and
 a single composition root (`startup.py`) that wires everything together.
 
+At the top level, the repo has three folders:
+
 ```
 src/
-├── cli.py                     # argparse subparsers + dispatch only — no wiring
-├── startup.py                  # config (Settings: folder_path, solver_name,
-│                                # output_folder_path) + composition root —
-│                                # the only place concrete adapters and use
-│                                # cases get constructed
-├── domain/                     # pure entities — Product, Request, Recommendation
-├── use_cases/
-│   ├── ports/                          # abstract interfaces (ABCs) the use cases depend on
-│   │   ├── base_data_loader.py
-│   │   ├── base_result_writer.py       # also defines TIMESTAMP_FORMAT
-│   │   ├── base_request_discovery.py
-│   │   └── base_solution_loader.py
-│   ├── optimization_response.py        # result of the two "solve" use cases
-│   ├── evaluation_response.py          # result of the "evaluate" use case
-│   ├── use_case_solve_single_request.py         # solve one request
-│   ├── use_case_solve_multiple_requests.py      # solve every request in a folder
-│   ├── use_case_evaluate_solution_for_request.py # feasibility-check a candidate solution
-│   └── solving/                        # internal implementation detail of the
-│       │                                # solve use cases — not a top-level layer
-│       ├── orchestrator.py             # pipeline coordinator: pre → provider → post
-│       ├── preprocessing/              # filter infeasible products before solving
-│       ├── postprocessing/             # sort and refine the recommendation
-│       └── optimization/               # SolutionProvider + 3 implementations:
-│                                        # enumeration (brute force), MIP (HiGHS), heuristic
-└── adapters/                   # concrete implementations of use_cases/ports/
-    ├── json_data_loader.py
-    ├── csv_result_writer.py
-    ├── json_result_writer.py
-    ├── directory_request_discovery.py
-    └── json_solution_loader.py
-tests/                  # mirrors src/ structure
-data/                   # sample problem instances
+tests/
+data/
+```
+
+### `src/`
+
+`src/`'s immediate contents are:
+
+```
+src/
+├── cli.py          # argparse subparsers + dispatch only — no wiring
+├── startup.py       # config (Settings) + composition root — the only place
+│                     # concrete adapters and use cases get constructed
+├── domain/          # pure entities — Product, Request, Recommendation
+├── use_cases/       # application rules (see below)
+└── adapters/        # I/O implementations (see below)
+```
+
+**`use_cases/`** in more detail:
+
+```
+use_cases/
+├── ports/                          # abstract interfaces (ABCs) the use cases depend on
+│   ├── base_data_loader.py
+│   ├── base_result_writer.py       # also defines TIMESTAMP_FORMAT
+│   ├── base_request_discovery.py
+│   └── base_solution_loader.py
+├── optimization_response.py        # result of the two "solve" use cases
+├── evaluation_response.py          # result of the "evaluate" use case
+├── use_case_solve_single_request.py         # solve one request
+├── use_case_solve_multiple_requests.py      # solve every request in a folder
+├── use_case_evaluate_solution_for_request.py # feasibility-check a candidate solution
+└── solving/                        # internal implementation detail of the
+    │                                # solve use cases — not a top-level layer
+    ├── orchestrator.py             # pipeline coordinator: pre → provider → post
+    ├── preprocessing/              # filter infeasible products before solving
+    ├── postprocessing/             # sort and refine the recommendation
+    └── optimization/               # SolutionProvider + 3 implementations:
+                                     # enumeration (brute force), MIP (HiGHS), heuristic
+```
+
+**`adapters/`** in more detail:
+
+```
+adapters/
+├── json_data_loader.py
+├── csv_result_writer.py
+├── json_result_writer.py
+├── directory_request_discovery.py
+└── json_solution_loader.py
 ```
 
 Dependencies only point inward: `adapters/` imports from `use_cases/`, never the
@@ -112,6 +132,14 @@ implementations) are separate from the public ports in `use_cases/ports/` —
 they are pluggable providers used only within the solving pipeline itself,
 not something `adapters/` or `startup.py` implement directly (`startup.py`
 only decides *which* MIP technology's `SolutionProvider` to construct).
+
+### `tests/`
+
+Mirrors `src/`'s structure — see the [Testing](#testing) section below.
+
+### `data/`
+
+Sample problem instances (input JSON), used as `python -m cli solve <n>` where `<n>` is a `data/` subfolder.
 
 ---
 
@@ -160,13 +188,6 @@ pytest -m integration
 ```
 Each integration test drives the real CLI end-to-end against a pre-built "situation" (`tests/resources/<situation>/`) and checks situation-specific conditions on the observable outcome only — e.g. the expected optimal calories, that an infeasible request exits non-zero and writes no solution, that tied optimal solutions still report the shared optimal total, or that a large instance correctly routes to the heuristic instead of the exact solvers. Formulation correctness (is the MIP model built right?) is checked separately and only at the unit level, by comparing `MipHighs`'s output against `EnumerationSolutionProvider`'s brute-force ground truth — see `tests/use_cases/solving/optimization/test_providers_agree_with_enumeration.py` — not by diffing a generated `model.lp` against a golden file.
 
-### Run tests by layer
-```bash
-pytest tests/domain/                  # domain unit tests only
-pytest tests/adapters/                # adapter tests only
-pytest tests/use_cases/               # use case tests (excluding the solving pipeline)
-pytest tests/use_cases/solving/       # solving pipeline: strategies, pre/postprocessing
-```
 
 ---
 
@@ -231,7 +252,7 @@ full dependency inversion — every collaborator is constructor-injected, and
    The solving pipeline itself lives in **`use_cases/solving/`** — an internal implementation detail of `SolveSingleRequest`, not a top-level architecture layer:
    - **`solving/orchestrator.py`** — Pipeline coordinator: runs preprocessing → picks a `SolutionProvider` → runs postprocessing. Picks based on problem size: a small enough combinatorial search space routes to brute-force enumeration; otherwise a small enough product count routes to the exact MIP solver; anything larger falls back to the fast heuristic.
    - **`solving/preprocessing/`** — Filters out products that can never be selected (individually infeasible).
-   - **`solving/optimization/`** — `SolutionProvider` (the shared ABC: `solve(data, output_dir) -> list[Recommendation]`) and three implementations:
+   - **`solving/optimization/`** — `SolutionProvider` (the shared ABC: `solve(data, output_dir) -> Recommendation | None`) and three implementations:
      - **`enumeration/enumeration_solution_provider.py`** — Brute-force exact solver: tries every feasible product-quantity combination and keeps the best. Used both as a real, fast solving path for small requests and as the ground-truth oracle other providers' tests are checked against.
      - **`mip/mip_highs.py`** — Exact MIP solver. Builds variables/constraints/objective directly against `highspy` and solves — no intermediate solver-agnostic model. This is deliberately self-contained per solver technology (rather than sharing a formulation layer across technologies) so a second technology (e.g. Google OR-Tools) can be added later as its own independent `SolutionProvider` implementation without touching this one.
      - **`heuristic/heuristic_solution_provider.py`** — Fast, approximate greedy solution for large problems.
