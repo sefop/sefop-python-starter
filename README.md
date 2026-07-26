@@ -111,8 +111,9 @@ use_cases/
     ├── orchestrator.py             # pipeline coordinator: pre → provider → post
     ├── preprocessing/              # filter infeasible products before solving
     ├── postprocessing/             # sort and refine the recommendation
-    └── optimization/               # SolutionProvider + 3 implementations:
-                                     # enumeration (brute force), MIP (HiGHS), heuristic
+    └── optimization/               # SolutionProvider + 4 implementations:
+                                     # enumeration (brute force), MIP (HiGHS),
+                                     # MIP (Google MathOpt/SCIP), heuristic
 ```
 
 **`adapters/`** in more detail:
@@ -252,9 +253,10 @@ full dependency inversion — every collaborator is constructor-injected, and
    The solving pipeline itself lives in **`use_cases/solving/`** — an internal implementation detail of `SolveSingleRequest`, not a top-level architecture layer:
    - **`solving/orchestrator.py`** — Pipeline coordinator: runs preprocessing → picks a `SolutionProvider` → runs postprocessing. Picks based on problem size: a small enough combinatorial search space routes to brute-force enumeration; otherwise a small enough product count routes to the exact MIP solver; anything larger falls back to the fast heuristic.
    - **`solving/preprocessing/`** — Filters out products that can never be selected (individually infeasible).
-   - **`solving/optimization/`** — `SolutionProvider` (the shared ABC: `solve(data, output_dir) -> Recommendation | None`) and three implementations:
+   - **`solving/optimization/`** — `SolutionProvider` (the shared ABC: `solve(data, output_dir) -> Recommendation | None`) and four implementations:
      - **`enumeration/enumeration_solution_provider.py`** — Brute-force exact solver: tries every feasible product-quantity combination and keeps the best. Used both as a real, fast solving path for small requests and as the ground-truth oracle other providers' tests are checked against.
-     - **`mip/mip_highs.py`** — Exact MIP solver. Builds variables/constraints/objective directly against `highspy` and solves — no intermediate solver-agnostic model. This is deliberately self-contained per solver technology (rather than sharing a formulation layer across technologies) so a second technology (e.g. Google OR-Tools) can be added later as its own independent `SolutionProvider` implementation without touching this one.
+     - **`mip_highs/mip_highs.py`** — Exact MIP solver. Builds variables/constraints/objective directly against `highspy` and solves — no intermediate solver-agnostic model. This is deliberately self-contained per solver technology (rather than sharing a formulation layer across technologies) so each solver technology can be added as its own independent `SolutionProvider` implementation without touching the others.
+     - **`mip_google/mip_google_scip.py`** — A second exact MIP solver, `MipGoogleScip`, built against Google OR-Tools' [MathOpt](https://developers.google.com/optimization/math_opt) API configured for the GSCIP (SCIP) backend. Same formulation as `MipHighs`, expressed with MathOpt's expression-based model-building API instead of HiGHS's index/matrix-based one. MathOpt's Python API has no LP/MPS exporter, so its `output_dir` debug artifact is `model.pbtxt` (the model dumped as protobuf text) rather than `model.lp`.
      - **`heuristic/heuristic_solution_provider.py`** — Fast, approximate greedy solution for large problems.
 
      `SolutionProvider` is an internal solving-strategy contract, separate from the public ports in `use_cases/ports/` — `startup.py` decides which concrete `SolutionProvider` to use for the MIP slot (via `Settings.solver_name`), but `Orchestrator` itself only ever depends on the abstract type.

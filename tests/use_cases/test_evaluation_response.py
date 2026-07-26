@@ -1,3 +1,5 @@
+import math
+
 import pytest
 
 from domain.product import Product
@@ -24,8 +26,8 @@ def test__evaluation_response__success__sets_feasible_and_totals(recommendation)
     # ASSERT
     assert response.feasible is True
     assert response.total_calories == recommendation.total_calories
-    assert response.total_cost_usd == recommendation.total_cost_usd
-    assert response.total_weight_kg == recommendation.total_weight_kg
+    assert math.isclose(response.total_cost_usd, recommendation.total_cost_usd)
+    assert math.isclose(response.total_weight_kg, recommendation.total_weight_kg)
     assert response.message is None
 
 

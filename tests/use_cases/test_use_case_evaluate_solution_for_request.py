@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 
 import pytest
@@ -105,5 +106,5 @@ def test__evaluate__given_feasible_candidate__returns_success_with_totals(reques
     # ASSERT
     assert response.feasible is True
     assert response.total_calories == 328
-    assert response.total_cost_usd == pytest.approx(2.0)
-    assert response.total_weight_kg == pytest.approx(0.44)
+    assert math.isclose(response.total_cost_usd, 2.0)
+    assert math.isclose(response.total_weight_kg, 0.44)

@@ -1,3 +1,5 @@
+import math
+
 import pytest
 from domain.product import Product
 
@@ -8,8 +10,8 @@ def test__product__given_valid_inputs__creates_successfully():
 
     # ASSERT
     assert product.name == "banana"
-    assert product.price_usd == 0.5
-    assert product.weight_kg == 0.12
+    assert math.isclose(product.price_usd, 0.5)
+    assert math.isclose(product.weight_kg, 0.12)
     assert product.calories == 89
 
 

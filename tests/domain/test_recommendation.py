@@ -1,3 +1,5 @@
+import math
+
 import pytest
 from domain.product import Product
 from domain.request import Request
@@ -26,8 +28,8 @@ def test__recommendation__given_valid_inputs__computes_totals_correctly(picnic_r
 
     # ASSERT
     assert rec.total_calories == 2 * 89 + 1 * 150  # 328
-    assert rec.total_cost_usd == pytest.approx(2 * 0.5 + 1 * 1.0)  # 2.0
-    assert rec.total_weight_kg == pytest.approx(2 * 0.12 + 1 * 0.2)  # 0.44
+    assert math.isclose(rec.total_cost_usd, 2 * 0.5 + 1 * 1.0)  # 2.0
+    assert math.isclose(rec.total_weight_kg, 2 * 0.12 + 1 * 0.2)  # 0.44
 
 
 def test__recommendation__given_empty_quantities__raises_value_error(picnic_request):

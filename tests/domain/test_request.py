@@ -1,3 +1,5 @@
+import math
+
 import pytest
 from domain.product import Product
 from domain.request import Request
@@ -18,8 +20,8 @@ def test__request__given_valid_inputs__creates_successfully(banana, chips):
     request = Request(max_weight_kg=5.0, max_budget_usd=10.0, products=[banana, chips])
 
     # ASSERT
-    assert request.max_weight_kg == 5.0
-    assert request.max_budget_usd == 10.0
+    assert math.isclose(request.max_weight_kg, 5.0)
+    assert math.isclose(request.max_budget_usd, 10.0)
     assert request.products == [banana, chips]
 
 

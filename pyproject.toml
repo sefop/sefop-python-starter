@@ -143,6 +143,14 @@ ignore_missing_imports = true
 # stubs, so mypy cannot see its types. Without this override, mypy fails with "Cannot find
 # implementation or library stub for module" every time highspy is imported.
 
+[[tool.mypy.overrides]]
+module = "ortools.*"
+ignore_missing_imports = true
+# ortools (Google OR-Tools, used by MipGoogleScip) ships no py.typed marker, so mypy can't see
+# its types even though the package itself has annotations. google.protobuf (also imported by
+# MipGoogleScip, to dump MathOpt's model proto) is covered separately by the types-protobuf
+# stub package instead of this override, since real stubs exist for it.
+
 # =============================================================================
 # Why this structure? (for data scientists new to Python packaging)
 # =============================================================================

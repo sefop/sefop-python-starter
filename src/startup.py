@@ -28,7 +28,8 @@ from use_cases.ports.base_request_discovery import BaseRequestDiscovery
 from use_cases.ports.base_result_writer import BaseResultWriter
 from use_cases.solving.optimization.enumeration.enumeration_solution_provider import EnumerationSolutionProvider
 from use_cases.solving.optimization.heuristic.heuristic_solution_provider import HeuristicSolutionProvider
-from use_cases.solving.optimization.mip.mip_highs import MipHighs
+from use_cases.solving.optimization.mip_google.mip_google_scip import MipGoogleScip
+from use_cases.solving.optimization.mip_highs.mip_highs import MipHighs
 from use_cases.solving.optimization.solution_provider import SolutionProvider
 from use_cases.solving.orchestrator import Orchestrator
 from use_cases.solving.postprocessing.postprocessing import PostProcess
@@ -51,7 +52,7 @@ class Settings:
     """
 
     folder_path: str = "data"
-    solver_name: str = "highs"
+    solver_name: str = "google_scip"
     output_folder_path: str = "output"
 
 
@@ -59,9 +60,10 @@ def build_mip_solution_provider(settings: Settings) -> SolutionProvider:
     """Resolve settings.solver_name to a concrete MIP SolutionProvider.
 
     This is the one place in the codebase where a solver name string is
-    mapped to a class. Adding a second MIP technology (e.g. Google OR-Tools)
-    means adding one more branch here and a new SolutionProvider
-    implementation — nothing else in the codebase needs to change.
+    mapped to a class. Adding another MIP technology (as MipGoogleScip was
+    added alongside MipHighs) means adding one more branch here and a new
+    SolutionProvider implementation — nothing else in the codebase needs to
+    change.
 
     Args:
         settings: Application settings; only solver_name is used.
@@ -74,7 +76,9 @@ def build_mip_solution_provider(settings: Settings) -> SolutionProvider:
     """
     if settings.solver_name == "highs":
         return MipHighs()
-    raise ValueError(f"Unknown solver '{settings.solver_name}'. Available: ['highs']")
+    if settings.solver_name == "google_scip":
+        return MipGoogleScip()
+    raise ValueError(f"Unknown solver '{settings.solver_name}'. Available: ['highs', 'google_scip']")
 
 
 def build_orchestrator(settings: Settings) -> Orchestrator:

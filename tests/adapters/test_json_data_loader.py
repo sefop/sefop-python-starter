@@ -1,4 +1,5 @@
 import json
+import math
 
 import pytest
 
@@ -39,12 +40,12 @@ def test__json_data_loader__when_valid_json__returns_request(tmp_path):
 
     # ASSERT
     assert result is not None
-    assert result.max_weight_kg == 1.0
-    assert result.max_budget_usd == 5.0
+    assert math.isclose(result.max_weight_kg, 1.0)
+    assert math.isclose(result.max_budget_usd, 5.0)
     assert len(result.products) == 1
     assert result.products[0].name == "banana"
-    assert result.products[0].price_usd == 1.00
-    assert result.products[0].weight_kg == 0.50
+    assert math.isclose(result.products[0].price_usd, 1.00)
+    assert math.isclose(result.products[0].weight_kg, 0.50)
     assert result.products[0].calories == 100
 
 

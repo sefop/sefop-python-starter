@@ -6,7 +6,7 @@ from domain.product import Product
 from domain.request import Request
 from use_cases.solving.optimization.enumeration.enumeration_solution_provider import EnumerationSolutionProvider
 from use_cases.solving.optimization.heuristic.heuristic_solution_provider import HeuristicSolutionProvider
-from use_cases.solving.optimization.mip.mip_highs import MipHighs
+from use_cases.solving.optimization.mip_highs.mip_highs import MipHighs
 from use_cases.solving.orchestrator import Orchestrator
 from use_cases.solving.postprocessing.postprocessing import PostProcess
 from use_cases.solving.preprocessing.preprocessing import PreProcess

@@ -1,6 +1,6 @@
-"""Cross-checks that MipHighs and HeuristicSolutionProvider agree with the
-brute-force EnumerationSolutionProvider oracle on small, hand-verifiable
-instances.
+"""Cross-checks that MipHighs, MipGoogleScip, and HeuristicSolutionProvider
+agree with the brute-force EnumerationSolutionProvider oracle on small,
+hand-verifiable instances.
 
 This is the replacement for the deleted component-level structural tests
 (test_variable_select_product.py, test_constraint_limit_budget.py, etc.):
@@ -15,7 +15,8 @@ from domain.product import Product
 from domain.request import Request
 from use_cases.solving.optimization.enumeration.enumeration_solution_provider import EnumerationSolutionProvider
 from use_cases.solving.optimization.heuristic.heuristic_solution_provider import HeuristicSolutionProvider
-from use_cases.solving.optimization.mip.mip_highs import MipHighs
+from use_cases.solving.optimization.mip_google.mip_google_scip import MipGoogleScip
+from use_cases.solving.optimization.mip_highs.mip_highs import MipHighs
 from use_cases.solving.preprocessing.pre_processed_data import PreProcessedData
 
 
@@ -55,6 +56,29 @@ def test__mip_highs__matches_enumeration_oracle_on_small_instances(banana, chips
 
     # ACT
     mip_result = MipHighs().solve(data)
+
+    # ASSERT — MIP is exact, so it must match the brute-force optimum exactly.
+    assert mip_result is not None
+    assert mip_result.total_calories == _oracle_calories(data)
+
+
+@pytest.mark.parametrize(
+    "max_weight_kg,max_budget_usd",
+    [
+        (5.0, 10.0),
+        (0.36, 2.0),
+        (0.52, 5.0),
+    ],
+)
+def test__mip_google_scip__matches_enumeration_oracle_on_small_instances(
+    banana, chips, soda, max_weight_kg, max_budget_usd
+):
+    # ARRANGE
+    request = Request(max_weight_kg=max_weight_kg, max_budget_usd=max_budget_usd, products=[banana, chips, soda])
+    data = PreProcessedData(request=request, feasible_products=[banana, chips, soda])
+
+    # ACT
+    mip_result = MipGoogleScip().solve(data)
 
     # ASSERT — MIP is exact, so it must match the brute-force optimum exactly.
     assert mip_result is not None

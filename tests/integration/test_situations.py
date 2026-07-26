@@ -9,6 +9,7 @@ and both constraints binding at once.
 """
 
 import csv
+import math
 from pathlib import Path
 
 import pytest
@@ -85,7 +86,7 @@ def test__cli_main__given_feasible_unique_optimum__returns_expected_optimal_calo
     # ASSERT
     assert exit_code == 0
     assert "SUCCESS" in (run_folder / "status.txt").read_text(encoding="utf-8")
-    assert _read_totals(run_folder)["calories"] == 500
+    assert math.isclose(_read_totals(run_folder)["calories"], 500)
 
 
 @pytest.mark.integration
@@ -113,7 +114,7 @@ def test__cli_main__given_multiple_optimal_solutions__returns_shared_optimal_cal
 
     # ASSERT
     assert exit_code == 0
-    assert _read_totals(run_folder)["calories"] == 100
+    assert math.isclose(_read_totals(run_folder)["calories"], 100)
 
 
 @pytest.mark.integration
@@ -148,7 +149,7 @@ def test__cli_main__given_individually_infeasible_products__filters_them_and_sol
 
     # ASSERT
     assert exit_code == 0
-    assert _read_totals(run_folder)["calories"] == 120
+    assert math.isclose(_read_totals(run_folder)["calories"], 120)
 
 
 @pytest.mark.integration
@@ -162,8 +163,8 @@ def test__cli_main__given_quantity_greater_than_one__selects_multiple_units_of_s
     # ASSERT
     assert exit_code == 0
     totals = _read_totals(run_folder)
-    assert totals["quantity"] == 10
-    assert totals["calories"] == 500
+    assert math.isclose(totals["quantity"], 10)
+    assert math.isclose(totals["calories"], 500)
 
 
 @pytest.mark.integration
@@ -178,6 +179,6 @@ def test__cli_main__given_both_constraints_binding__saturates_budget_and_weight_
     # ASSERT
     assert exit_code == 0
     totals = _read_totals(run_folder)
-    assert totals["cost"] == 9
-    assert totals["weight"] == 6
-    assert totals["calories"] == 145
+    assert math.isclose(totals["cost"], 9)
+    assert math.isclose(totals["weight"], 6)
+    assert math.isclose(totals["calories"], 145)
