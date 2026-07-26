@@ -36,7 +36,7 @@ $$\sum_{i \in I} \text{price}_i \cdot x_i \le B \qquad \text{(budget)}$$
 
 $$\sum_{i \in I} \text{weight}_i \cdot x_i \le W \qquad \text{(weight limit)}$$
 
-$$x_i \in \mathbb{Z}_{\ge 0} \quad \forall i \in I \qquad \text{(non-negativity and integrality)}$$
+$$x_i \in \mathbb{Z} {\ge 0} \quad \forall i \in I \qquad \text{(non-negativity and integrality)}$$
 
 Because $x_i$ has no upper bound, this is an **unbounded knapsack problem**: any number of units of a product may be chosen, which is why integrality must be enforced explicitly rather than relying on a 0/1 selection variable.
 
