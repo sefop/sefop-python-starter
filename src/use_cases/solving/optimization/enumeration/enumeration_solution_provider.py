@@ -67,6 +67,10 @@ class EnumerationSolutionProvider(SolutionProvider):
     silently drift apart.
     """
 
+    @property
+    def name(self) -> str:
+        return "Brute-force Enumeration"
+
     def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Exhaustively search every product-quantity combination.
 

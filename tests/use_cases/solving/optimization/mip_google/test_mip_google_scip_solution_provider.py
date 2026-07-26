@@ -22,6 +22,11 @@ def preprocessed_data(banana, chips) -> PreProcessedData:
     return PreProcessedData(request=request, feasible_products=[banana, chips])
 
 
+def test__name__returns_human_friendly_label():
+    # ACT / ASSERT
+    assert MipGoogleScipSolutionProvider().name == "MIP (Google SCIP)"
+
+
 def test__solve__recommendation_maps_solved_quantities_back_to_the_right_products(preprocessed_data, banana, chips):
     # ACT
     recommendation = MipGoogleScipSolutionProvider().solve(preprocessed_data)

@@ -30,6 +30,10 @@ class HeuristicSolutionProvider(SolutionProvider):
     in practice for the calorie-maximization objective.
     """
 
+    @property
+    def name(self) -> str:
+        return "Greedy Heuristic"
+
     def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Greedily select products ranked by calories per kg.
 

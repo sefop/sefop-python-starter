@@ -16,6 +16,11 @@ def chips() -> Product:
     return Product(name="chips", price_usd=1.0, weight_kg=0.2, calories=150)
 
 
+def test__name__returns_human_friendly_label():
+    # ACT / ASSERT
+    assert HeuristicSolutionProvider().name == "Greedy Heuristic"
+
+
 def test__solve__when_no_product_fits__returns_none():
     # ARRANGE — budget too tight for any product
     heavy = Product(name="heavy", price_usd=100.0, weight_kg=10.0, calories=500)

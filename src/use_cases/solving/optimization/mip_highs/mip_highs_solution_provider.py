@@ -48,6 +48,10 @@ class MipHighsSolutionProvider(SolutionProvider):
     Where x_i is the number of units of product i selected.
     """
 
+    @property
+    def name(self) -> str:
+        return "MIP (HiGHS)"
+
     def solve(self, data: PreProcessedData, output_dir: Path | None = None) -> Recommendation | None:
         """Build, solve, and extract a Recommendation from the MIP model.
 

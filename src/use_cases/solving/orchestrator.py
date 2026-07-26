@@ -92,6 +92,7 @@ class Orchestrator:
             logger.warning("No feasible products after preprocessing; skipping solve")
             return None
         provider = self._select_provider(data)
+        logger.info("Selected provider: %s", provider.name)
         recommendation = provider.solve(data, output_dir)
         if recommendation is None:
             return None

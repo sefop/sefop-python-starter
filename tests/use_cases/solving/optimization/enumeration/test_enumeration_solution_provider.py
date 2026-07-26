@@ -19,6 +19,11 @@ def chips() -> Product:
     return Product(name="chips", price_usd=2.0, weight_kg=1.0, calories=15)
 
 
+def test__name__returns_human_friendly_label():
+    # ACT / ASSERT
+    assert EnumerationSolutionProvider().name == "Brute-force Enumeration"
+
+
 def test__solve__known_optimum__returns_the_best_combination(banana, chips):
     # ARRANGE — budget=4, weight=4. Hand-verified by exhaustive listing: 4
     # banana = 40 calories beats every other combination (e.g. 2 chips = 30,
