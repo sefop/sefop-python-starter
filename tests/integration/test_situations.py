@@ -46,7 +46,15 @@ def _run_cli(
     """
     monkeypatch.setattr(
         "sys.argv",
-        ["cli", situation, "--data-folder", str(_RESOURCES_DIR), "--output-folder", str(integration_output_root)],
+        [
+            "cli",
+            "solve",
+            situation,
+            "--data-folder",
+            str(_RESOURCES_DIR),
+            "--output-folder",
+            str(integration_output_root),
+        ],
     )
     with pytest.raises(SystemExit) as exc_info:
         cli.main()

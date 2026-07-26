@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from services.csv_result_writer import TIMESTAMP_FORMAT
+from use_cases.ports.base_result_writer import TIMESTAMP_FORMAT
 
 # Anchored to this file rather than the current working directory so the
 # suite always writes to the same place regardless of where `pytest` is
@@ -33,8 +33,8 @@ def integration_output_root() -> Path:
     situation from a single test run lands side by side under
     output/integration_tests/<session_timestamp>/ instead of each getting
     its own throwaway folder -- making it possible to inspect or diff an
-    entire run's output as one unit. Reuses TIMESTAMP_FORMAT from
-    csv_result_writer rather than inventing a second format, since
+    entire run's output as one unit. Reuses TIMESTAMP_FORMAT from the
+    BaseResultWriter port rather than inventing a second format, since
     CsvResultWriter nests its own per-response timestamp folder one level
     below whatever this fixture returns.
 
