@@ -85,9 +85,9 @@ src/
 │   │   └── base_solution_loader.py
 │   ├── optimization_response.py        # result of the two "solve" use cases
 │   ├── evaluation_response.py          # result of the "evaluate" use case
-│   ├── solve_single_request.py         # solve one request
-│   ├── solve_multiple_requests.py      # solve every request in a folder
-│   ├── evaluate_solution_for_request.py # feasibility-check a candidate solution
+│   ├── use_case_solve_single_request.py         # solve one request
+│   ├── use_case_solve_multiple_requests.py      # solve every request in a folder
+│   ├── use_case_evaluate_solution_for_request.py # feasibility-check a candidate solution
 │   └── solving/                        # internal implementation detail of the
 │       │                                # solve use cases — not a top-level layer
 │       ├── orchestrator.py             # pipeline coordinator: pre → strategy → post

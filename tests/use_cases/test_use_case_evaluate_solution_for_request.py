@@ -4,9 +4,9 @@ import pytest
 
 from domain.product import Product
 from domain.request import Request
-from use_cases.evaluate_solution_for_request import EvaluateSolutionForRequest
 from use_cases.ports.base_data_loader import BaseDataLoader
 from use_cases.ports.base_solution_loader import BaseSolutionLoader
+from use_cases.use_case_evaluate_solution_for_request import EvaluateSolutionForRequest
 
 
 class _FakeDataLoader(BaseDataLoader):

@@ -15,11 +15,8 @@ from adapters.json_data_loader import JsonDataLoader
 from adapters.json_result_writer import JsonResultWriter
 from adapters.json_solution_loader import JsonSolutionLoader
 from settings import Settings
-from use_cases.evaluate_solution_for_request import EvaluateSolutionForRequest
 from use_cases.ports.base_request_discovery import BaseRequestDiscovery
 from use_cases.ports.base_result_writer import BaseResultWriter
-from use_cases.solve_multiple_requests import SolveMultipleRequests
-from use_cases.solve_single_request import SolveSingleRequest
 from use_cases.solving.optimization.heuristic.greedy_calories import GreedyCalories
 from use_cases.solving.optimization.mip.mip_strategy import MipStrategy
 from use_cases.solving.optimization.mip.optimization.optimization import Optimization
@@ -28,6 +25,9 @@ from use_cases.solving.optimization.mip.optimization.solvers.highs_solver import
 from use_cases.solving.orchestrator import Orchestrator
 from use_cases.solving.postprocessing.postprocessing import PostProcess
 from use_cases.solving.preprocessing.preprocessing import PreProcess
+from use_cases.use_case_evaluate_solution_for_request import EvaluateSolutionForRequest
+from use_cases.use_case_solve_multiple_requests import SolveMultipleRequests
+from use_cases.use_case_solve_single_request import SolveSingleRequest
 
 
 def build_solver(settings: Settings) -> BaseTechnologySolver:

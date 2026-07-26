@@ -5,7 +5,6 @@ import pytest
 from domain.product import Product
 from domain.request import Request
 from use_cases.ports.base_data_loader import BaseDataLoader
-from use_cases.solve_single_request import SolveSingleRequest
 from use_cases.solving.optimization.heuristic.greedy_calories import GreedyCalories
 from use_cases.solving.optimization.mip.mip_strategy import MipStrategy
 from use_cases.solving.optimization.mip.optimization.optimization import Optimization
@@ -13,6 +12,7 @@ from use_cases.solving.optimization.mip.optimization.solvers.highs_solver import
 from use_cases.solving.orchestrator import Orchestrator
 from use_cases.solving.postprocessing.postprocessing import PostProcess
 from use_cases.solving.preprocessing.preprocessing import PreProcess
+from use_cases.use_case_solve_single_request import SolveSingleRequest
 
 
 class _FakeDataLoader(BaseDataLoader):

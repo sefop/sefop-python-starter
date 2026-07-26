@@ -15,7 +15,7 @@ from pathlib import Path
 
 from use_cases.optimization_response import OptimizationResponse
 from use_cases.ports.base_request_discovery import BaseRequestDiscovery
-from use_cases.solve_single_request import SolveSingleRequest
+from use_cases.use_case_solve_single_request import SolveSingleRequest
 
 logger = logging.getLogger(__name__)
 
